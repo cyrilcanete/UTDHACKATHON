@@ -1,0 +1,14 @@
+{
+  "demo": true,
+  "name": "Cyril",
+  "timezone": "America/Chicago",
+  "location": "Richardson, TX",
+  "latitude": 32.9483,
+  "longitude": -96.7299,
+  "calendar_id": "primary",
+  "tasks": ["Choose today's most important task", "Check your next event"],
+  "ai_enabled": false,
+  "ollama_url": "http://127.0.0.1:11434",
+  "ollama_model": "qwen2.5:3b",
+  "briefing_interval_seconds": 1800
+}
