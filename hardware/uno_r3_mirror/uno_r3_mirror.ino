@@ -6,6 +6,7 @@ MFRC522 reader(10, 5);
 void emitEncoder(int delta) {
   Serial.print(F("{\"type\":\"encoder\",\"delta\":")); Serial.print(delta); Serial.println('}');
 }
+void emitAnalyze() { Serial.println(F("{\"type\":\"encoder\",\"action\":\"analyze\"}")); }
 void emitPress() { Serial.println(F("{\"type\":\"encoder\",\"action\":\"press\"}")); }
 void emitSensors(float temperature, float humidity, bool motion) {
   Serial.print(F("{\"type\":\"sensors\",\"temperature_c\":"));
