@@ -106,6 +106,7 @@ function render() {
   write('greeting',`Hello, ${dashboard.settings.name}.`);
   write('mode',dashboard.settings.demo ? 'DEMO · FICTIONAL ACCOUNT DATA' : 'LIVE ACCOUNT DATA');
   write('location',dashboard.settings.location); write('notice',m.event);
+  write('rfid-status',m.rfid_status || 'RFID not connected');
   el('personal-mode').setAttribute('aria-pressed',String(m.mode==='personal'));
   el('work-mode').setAttribute('aria-pressed',String(m.mode==='work'));
   el('personal-panels').hidden=m.mode!=='personal'; el('weather-panel').hidden=m.mode!=='personal';

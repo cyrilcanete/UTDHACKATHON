@@ -1,6 +1,36 @@
 # Morning Mirror
 
-Two RFID cards select two people. A rotary encoder selects Personal or Work mode for the active person. Built for an Arduino Uno R3 and Raspberry Pi 4B (2GB); all software features can be developed on a Windows PC without hardware.
+Two RFID cards select Cyril or Sarah. A rotary encoder selects Personal or Work mode for the active person. The current setup runs the Python dashboard on Arduino UNO Q Linux and displays it in the Raspberry Pi's browser through SSH forwarding. The earlier Uno R3-to-Pi serial option is also supported; all software features can be developed without hardware.
+
+## UNO Q: connect the tested RC522 reader
+
+| Card | UID | Display profile |
+| --- | --- | --- |
+| White card | `F0 E2 E5 5C` | Cyril |
+| Blue key fob | `87 4B BA 62` | Sarah |
+
+A physical scan opens the selected person's **Personal** mode. Both people can then switch to Work. Unknown cards keep the current profile and mode. Sarah keeps the internal profile ID `partner`, preserving its existing private account/cache directory.
+
+The existing `RFID_Test` MCU sketch uses SS D10, SCK D13, MOSI D11, MISO D12, RST D5, 3.3V and GND; IRQ is unused. It sends `on_rfid_uid` to App Lab Python using Arduino RouterBridge. The replacement Python callback appends scan events to a small journal in the app's shared `/app` folder; the Linux dashboard reads the corresponding host folder. This avoids assuming that container localhost is the Linux host's localhost. No card memory is written and no network hardware API is enabled.
+
+**Deploy from the UNO Q SSH session (`arduino@Smart-Mirror`):** stop the foreground dashboard with Ctrl+C first. Stop RFID_Test in App Lab before replacing its Python callback. Then run:
+
+```bash
+cd ~/UTDHACKATHON
+git pull --ff-only
+.venv/bin/python setup_uno_q_rfid.py
+arduino-app-cli app restart "$HOME/ArduinoApps/rfid_test"
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python app.py
+```
+
+Run each command only after the previous one succeeds. If App Lab uses another folder, pass `--app-path /actual/app/folder` to setup. The setup command backs up the old callback and local config, preserves the working MCU sketch/dependencies and all account files, assigns the two UIDs, and enables the local reader. It does not start either app or claim a successful hardware test. The sketch and manifest in `hardware/uno_q_rfid/` record the tested reader setup; the installer uses your existing App Lab app rather than replacing its sketch.
+
+Keep `demo: true` if you still want fictional account data and simulated environmental readings. Actual card input works independently of `sensors.source`; enabling RFID does not turn simulated temperatures into live sensor measurements. Browser demo buttons are still labeled as simulations.
+
+After both apps start, refresh the dashboard. Scan the **blue key**, remove it, then scan the **white card**. Verify `Hello, Sarah.` then `Hello, Cyril.` on the real display, and check App Lab Python for corresponding `rfid_scan_written` events. Each physical scan returns to Personal. Old journal entries are skipped after dashboard restart; scan again to select a profile. The footer reports waiting, received or unassigned scan status. Software tests exercise the callback/journal/dashboard path with synthetic events; actual RC522 scans must be verified on the board after installation.
+
+The Pi and laptop can retain their existing SSH forwards to UNO Q localhost port 5000. No dashboard code needs installing on the Pi for this layout. The foreground dashboard and temporary tunnels still need to stay running; this change does not install an automatic boot service.
 
 ## Run the demo now
 
@@ -12,7 +42,7 @@ py app.py
 
 On Linux/Pi use `python3 app.py`. Open **http://127.0.0.1:5000** in a browser on that same computer. Stop an existing copy with Ctrl+C before starting the new one. The demo needs Python 3.10+ and no account credentials, model, sensor or third-party packages. If Windows reports a missing timezone database, install the included requirements in a virtual environment.
 
-- Click **Scan Cyril's card** or **Scan Partner's card** to simulate an RFID profile selection.
+- Click **Scan Cyril's card** or **Scan Sarah's card** to simulate an RFID profile selection.
 - Click **Personal** or **Work**, or press **M**. Each person's chosen mode is remembered until the server restarts.
 - Personal shows that person's fictional schedule, inbox, focus tasks and briefing. Try the example messages in **Message check**.
 - Work shows shared room temperature, humidity, motion, threshold alerts and a handoff note. Try **Cooling issue**, **Low humidity**, **Sensor offline**, and **Normal**.
@@ -27,18 +57,18 @@ The app uses `config.json` when present, otherwise `config.example.json`. Copy t
 
 ```json
 "profiles": [
-  {"id": "cyril", "name": "Cyril", "rfid_uids": ["04 A1 B2 C3"], "tasks": ["Prepare the demo"]},
-  {"id": "partner", "name": "Partner", "rfid_uids": ["12 34 56 78"], "tasks": ["Review the checklist"]}
+  {"id": "cyril", "name": "Cyril", "rfid_uids": ["F0 E2 E5 5C"], "tasks": ["Prepare the demo"]},
+  {"id": "partner", "name": "Sarah", "rfid_uids": ["87 4B BA 62"], "tasks": ["Review the checklist"]}
 ]
 ```
 
-These are fields inside the config object. **Replace the example UIDs with your actual card IDs.** Empty UID lists are intentional in the shipped config. Rename Partner to your girlfriend's preferred name. Card identifiers are normalized across spaces, colons, dashes and letter case. Each UID can belong to one profile; unknown cards keep the current profile and show their UID so you can register them. Card selection does not require writing personal information to the cards.
+These are fields inside the config object. They contain Cyril and Sarah's supplied card IDs; replace them when using different cards. Existing `config.json` files take precedence over the example, so use the UNO Q setup command above to update an existing installation. Card identifiers are normalized across spaces, colons, dashes and letter case. Each UID can belong to one profile; unknown cards keep the current profile and show their UID so you can register them. Card selection does not require writing personal information to the cards.
 
-Older configs without `profiles` get the existing owner's name/tasks plus a separate Partner demo profile. To customize those or register cards, add the profiles list above. RFID and demo controls select a display profile; they are not secure authentication or a screen lock.
+Older configs without `profiles` get the existing owner's name/tasks plus Sarah's profile, with the supplied card assignments. The setup command preserves other profile fields when configuring an existing installation. RFID and demo controls select a display profile; they are not secure authentication or a screen lock.
 
 ## Software interface for your hardware partner
 
-The Arduino should send **one UTF-8 JSON object per line**, ending each with a newline. Use these exact keys and units:
+For the earlier Uno R3 serial layout, the Arduino should send **one UTF-8 JSON object per line**, ending each with a newline. The UNO Q App Lab bridge above instead uses the existing RouterBridge callback. For serial, use these exact keys and units:
 
 ```json
 {"type":"rfid","uid":"04 A1 B2 C3"}

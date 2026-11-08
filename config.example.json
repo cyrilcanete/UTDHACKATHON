@@ -16,16 +16,20 @@
     {
       "id": "cyril",
       "name": "Cyril",
-      "rfid_uids": [],
+      "rfid_uids": ["F0 E2 E5 5C"],
       "tasks": ["Prepare the software demo", "Review today's schedule"]
     },
     {
       "id": "partner",
-      "name": "Partner",
-      "rfid_uids": [],
+      "name": "Sarah",
+      "rfid_uids": ["87 4B BA 62"],
       "tasks": ["Test the RFID reader", "Check the project checklist"]
     }
   ],
+  "rfid": {
+    "source": "none",
+    "event_path": ""
+  },
   "sensors": {
     "source": "demo",
     "port": "",

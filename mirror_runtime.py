@@ -20,8 +20,8 @@ def normalize_uid(value):
 def profiles_for(cfg):
     # Older config.json files get two profiles without losing the owner's settings.
     profiles = copy.deepcopy(cfg.get("profiles") or [
-        {"id": "cyril", "name": cfg["name"], "tasks": cfg["tasks"], "rfid_uids": []},
-        {"id": "partner", "name": "Partner", "tasks": ["Review today's schedule", "Prepare the project demo"], "rfid_uids": []},
+        {"id": "cyril", "name": cfg["name"], "tasks": cfg["tasks"], "rfid_uids": ["F0 E2 E5 5C"]},
+        {"id": "partner", "name": "Sarah", "tasks": ["Review today's schedule", "Prepare the project demo"], "rfid_uids": ["87 4B BA 62"]},
     ])
     if not isinstance(profiles, list) or not all(isinstance(p, dict) for p in profiles):
         raise ValueError("profiles must be a list of profile objects")
@@ -92,6 +92,7 @@ class MirrorRuntime:
         self.updated = None
         self.event = "Scan a card or choose a demo profile." if cfg["demo"] else "Scan your registered card to select a profile."
         self.transport_error = None
+        self.rfid_status = "RFID not connected"
         self.invalid_lines = 0
         self.scenario = "normal"
         if self.source == "demo":
@@ -208,6 +209,7 @@ class MirrorRuntime:
                 "active_profile": self.active,
                 "profiles": [{"id": p["id"], "name": p["name"]} for p in self.profiles],
                 "mode": self.modes[self.active], "event": self.event, "screen_awake": awake,
+                "rfid_status": self.rfid_status,
                 "sensors": {**readings, "source": self.source, "simulated": simulated, "updated": self.updated,
                             "status": status, "error": self.transport_error, "invalid_lines": self.invalid_lines},
                 "work": {"status": status, "alerts": alerts, "handoff": handoff, "scenario": self.scenario,

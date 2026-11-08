@@ -153,7 +153,7 @@ class FeatureTests(unittest.TestCase):
         app.STATE["inbox"]["data"]["messages"][0]["subject"] = "OWNER ONLY"
         app.RUNTIME.select_profile("partner")
         state = app.public_state(self.cfg)
-        self.assertEqual(state["settings"]["name"], "Partner")
+        self.assertEqual(state["settings"]["name"], "Sarah")
         self.assertNotIn("OWNER ONLY", json.dumps(state))
         owner = app.profile_private(profile_config(self.cfg, "cyril"))
         partner = app.profile_private(profile_config(self.cfg, "partner"))
@@ -224,7 +224,7 @@ class ApiTests(unittest.TestCase):
 
     def test_demo_scan_modes_and_scenarios(self):
         state = self.post("/api/demo/scan", {"profile_id": "partner"})
-        self.assertEqual(state["settings"]["name"], "Partner")
+        self.assertEqual(state["settings"]["name"], "Sarah")
         state = self.post("/api/mode", {"mode": "work"})
         self.assertNotIn("inbox", state)
         state = self.post("/api/demo/scenario", {"scenario": "hot"})

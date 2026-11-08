@@ -16,6 +16,7 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 from mirror_runtime import MirrorRuntime, profile_config, profiles_for, serial_worker
 from message_review import SAMPLES, review_message
+from rfid_bridge import rfid_worker
 
 BASE = Path(__file__).resolve().parent
 PRIVATE = BASE / "private"
@@ -397,6 +398,7 @@ def main():
     for profile in profiles_for(cfg):
         threading.Thread(target=worker, args=(cfg, stop, profile["id"]), daemon=True).start()
     threading.Thread(target=serial_worker, args=(RUNTIME, stop), daemon=True).start()
+    threading.Thread(target=rfid_worker, args=(RUNTIME, stop), daemon=True).start()
     print("Mirror ready: http://127.0.0.1:5000 — " + ("DEMO" if cfg["demo"] else "LIVE"), flush=True)
     try:
         server.serve_forever()
