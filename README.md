@@ -1,6 +1,19 @@
-# Smart Mirror — Cyril and Sarah
+# MirrorMode — Smart Mirror for Personal and Work
 
-The Nemotron integration includes `mirror-update` commit `323a218` (personal content, simpler work screens and room warning), retaining its card IDs and UNO Q bridge. It also supports the Uno R3 + Raspberry Pi 4 USB-serial arrangement. Use the transport that matches where your existing hardware code runs; don't change working wiring just to match a reference sketch. The repository's `main` branch still contains the early dashboard; use the integration branch for these features.
+MirrorMode combines RFID-selected personal profiles, a Raspberry Pi mirror display, Arduino inputs, room sensors, and NVIDIA Nemotron evidence-review workflows. This submission includes the Nemotron integration and `mirror-update` commit `323a218` (personal content, simpler work screens and room warning), retaining its card IDs and UNO Q bridge. It also supports the Uno R3 + Raspberry Pi 4 USB-serial arrangement. Use the transport that matches where your existing hardware code runs; don't change working wiring just to match a reference sketch.
+
+## Submission source package and verification
+
+- `hardware/uno_q_rfid/`: integrated Arduino App Lab app, Python callbacks, MCU sketch and dependency manifests.
+- `hardware/uno_r3_mirror/`: alternative USB-serial firmware.
+- `hardware/validation/`: standalone DHT11, PIR, encoder and RFID App Lab diagnostic projects, plus dated result summaries. These are component tests; use the integrated app for the mirror.
+- `deployment/pi-kiosk/`: the existing Raspberry Pi display helper, with its installation-specific prerequisites documented.
+
+On November 8, 2026, the team reported verifying physical card scans, knob controls, live sensor readings and real Nemotron responses together on the final Arduino/Raspberry Pi mirror setup. This is the team's physical-demo verification; the automated tests below separately check software behavior. Earlier component result files retain their original dates and limitations, including where dashboard integration had not yet been tested at that time.
+
+Demo video: [MirrorMode hardware demonstration](https://www.youtube.com/watch?v=AgHRJhkbArY).
+
+Private account tokens, credentials, API keys, local configuration and raw activity logs are not part of this source package.
 
 ## What the mirror does
 
@@ -265,7 +278,7 @@ Unknown tools/arguments and incomplete tool loops fail back to the deterministic
 
 Automatic calls run in the background in the active mode, at most once per five minutes per profile/workflow when evidence changes. Explicit quick presses or **A** requests can start a new review sooner, subject to the server's ten-second cooldown. Failed automatic calls can retry after their interval. Each workflow has a configurable 120-second overall budget, a 45-second per-request timeout, a nine-request cap, and a bounded tool-call count. A model that answers before gathering the required evidence gets one correction; incomplete or truncated results are rejected. No automatic provider fallback occurs. Generated answers show their generation time and remain scoped to the profile and captured evidence. The historical ESIF timestamp is always kept separate.
 
-**Validation limit:** automated tests cover the protocol, tool results, parsing and error paths using mocked NVIDIA responses. No NVIDIA account key was available in this development session, so this package does not claim a successful hosted inference call. The local launcher provides that verification step using your account.
+**Validation:** automated tests cover the protocol, tool results, parsing and error paths using mocked NVIDIA responses. The team separately reported successful real Nemotron responses on the final mirror on November 8, 2026. Automated test success alone does not prove hosted inference or physical hardware operation. The local launcher provides a repeatable hosted verification step using your own account.
 
 [NVIDIA API reference](https://docs.api.nvidia.com/nim/reference/nvidia-nemotron-3-5-lightning-30b-a3b-infer) · [NVIDIA hosted tool-calling configuration](https://docs.nvidia.com/nemo/labs-voice-agent/about/core-concepts/language-models/llm-backends/) · [HackUTD 2026 sponsor challenges](https://zeroday.hackutd.co/).
 

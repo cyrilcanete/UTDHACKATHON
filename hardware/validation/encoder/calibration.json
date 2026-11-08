@@ -1,0 +1,11 @@
+{
+  "tested_on": "2026-11-07",
+  "board": "Arduino UNO Q",
+  "pins": {"clk": 2, "dt": 3, "button": 4},
+  "quarter_steps_per_click": 4,
+  "clockwise_sign": -1,
+  "counterclockwise_sign": 1,
+  "button_press_and_release_observed": true,
+  "evidence": "App Lab Serial Monitor shows signed movement and button events; user confirmed physical direction.",
+  "dashboard_integration_tested": false
+}

@@ -1,0 +1,18 @@
+{
+  "tested_on": "2026-11-08",
+  "board": "Arduino UNO Q",
+  "pin": 7,
+  "valid_readings": 432,
+  "failed_readings": 0,
+  "temperature_c_range": [
+    20.2,
+    30.9
+  ],
+  "humidity_pct_range": [
+    37.3,
+    92.0
+  ],
+  "basic_read_test_passed": true,
+  "calibrated_accuracy_tested": false,
+  "dashboard_integration_tested": false
+}

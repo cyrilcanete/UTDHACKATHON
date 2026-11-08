@@ -1,0 +1,12 @@
+{
+  "tested_on": "2026-11-08",
+  "board": "Arduino UNO Q",
+  "pin": 6,
+  "basic_motion_input_test_passed": true,
+  "observations": [
+    "After warm-up, the MCU reported a sustained motion=false interval.",
+    "After the requested walk across the sensor, the MCU reported motion=true followed by motion=false.",
+    "The user confirmed motion detection and explained that they remained in view during repeated triggers."
+  ],
+  "dashboard_sleep_wake_tested": false
+}
