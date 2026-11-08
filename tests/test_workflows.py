@@ -80,12 +80,17 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(transport.call_count,5)
 
     def test_personal_results_are_profile_and_evidence_isolated(self):
-        pa=PersonalAssistant(self.cfg)
+        cfg=copy.deepcopy(self.cfg)
+        cfg['nemotron'].update(enabled=True,allow_demo=True,personal_enabled=True)
+        pa=PersonalAssistant(cfg)
         a={'data':{'reviews':[{'id':'a'}]}};b={'data':{'reviews':[{'id':'b'}]}}
         pa.results['cyril']={'key':pa.fingerprint(a),'result':{'note':'CYRIL ONLY','method':'test'}}
-        self.assertIsNone(pa.snapshot('partner',a)['ai'])
-        self.assertIsNone(pa.snapshot('cyril',b)['ai'])
-        self.assertEqual(pa.snapshot('cyril',a)['ai']['note'],'CYRIL ONLY')
+        with patch('personal_assistant.validate_options'):
+            self.assertIsNone(pa.snapshot('partner',a)['ai'])
+            self.assertIsNone(pa.snapshot('cyril',b)['ai'])
+            self.assertEqual(pa.snapshot('cyril',a)['ai']['note'],'CYRIL ONLY')
+            cfg['nemotron']['personal_enabled']=False
+            self.assertIsNone(pa.snapshot('cyril',a)['ai'])
         app.RUNTIME.set_mode('welcome');self.assertNotIn('personal_assistant',app.public_state(self.cfg))
 
     def test_personal_network_requires_separate_opt_in(self):
