@@ -28,6 +28,10 @@ def on_mirror_press():
     publisher.publish_event({"type": "encoder", "action": "press"})
 
 
+def on_mirror_analyze():
+    publisher.publish_event({"type": "encoder", "action": "analyze"})
+
+
 def on_mirror_sensors(temperature: float, humidity: float, motion: bool):
     # The firmware sends -999 when DHT11 fails; never substitute a normal reading.
     temp = float(temperature)
@@ -40,6 +44,7 @@ def on_mirror_sensors(temperature: float, humidity: float, motion: bool):
 
 Bridge.provide("on_mirror_encoder", on_mirror_encoder)
 Bridge.provide("on_mirror_press", on_mirror_press)
+Bridge.provide("on_mirror_analyze", on_mirror_analyze)
 Bridge.provide("on_mirror_sensors", on_mirror_sensors)
 Bridge.provide("on_rfid_uid", on_rfid_uid)
 print("RFID mirror listener started. Scan white for Cyril or blue for Sarah.", flush=True)
