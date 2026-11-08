@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 from mirror_runtime import MirrorRuntime, profile_config, profiles_for, serial_worker
 from message_review import SAMPLES, review_message, PHISHING_QUERY, review_inbox_messages
 from work_assistant import WorkAssistant
+from personal_assistant import PersonalAssistant
 from rfid_bridge import rfid_worker
 
 BASE = Path(__file__).resolve().parent
@@ -26,6 +27,7 @@ STATE = {}
 PROFILE_STATES = {}
 RUNTIME = None
 WORK = None
+PERSONAL = None
 
 def stamp():
     return datetime.now(timezone.utc).isoformat()
@@ -194,20 +196,20 @@ def briefing(cfg, snapshot):
 def demo_data(cfg):
     now = datetime.now(timezone.utc)
     partner = cfg.get("_private_subdir") is not None
-    meeting = f"{cfg['name']}'s example planning session" if partner else "Example project meeting"
-    subject = "Your demo schedule is ready" if partner else "Bring your project notes"
-    summary = (f"Sample briefing for {cfg['name']}: your planning session starts in 45 minutes. "
-               "This is fictional demo data, not an AI-generated live summary.")
+    meeting = "Sensor validation review" if partner else "Smart Mirror project meeting"
+    subject = "Sensor checklist for our next review" if partner else "Bring your project notes"
+    summary = (f"{cfg['name']}, your planning session starts in 45 minutes. Bring your notes and review the sensor checklist before the meeting.")
     return {"weather": {"temperature": 72, "feels_like": 73, "condition": "Partly cloudy", "high": 78, "low": 61, "rain": 35},
         "calendar": [{"id": "event:demo", "title": meeting, "start": (now+timedelta(minutes=45)).isoformat(),
                       "end": (now+timedelta(minutes=90)).isoformat(), "all_day": False, "location": "Study room"}],
-        "inbox": {"unread": 2, "messages": [{"id": "mail:demo", "sender": "Example teammate", "subject": subject, "received": now.isoformat(), "body": ""}], "reviews": review_inbox_messages([{ "id": "mail:example-prize", "subject": "Fictional example: free prize", "sender": "Example sender", "body": SAMPLES[3]["text"]}]), "review_scope": "Fictional example · no real inbox searched"},
-        "briefing": {"summary": summary, "action_items": [{"text": "Review your demo schedule" if partner else "Bring project notes", "source_ids": ["mail:demo"]}]}}
+        "inbox": {"unread": 2, "messages": [{"id": "mail:demo", "sender": "Cyril" if partner else "Sarah", "subject": subject, "received": now.isoformat(), "body": ""}], "reviews": review_inbox_messages([{ "id": "mail:example-prize", "subject": "Account verification required" if partner else "Last chance: claim your free prize", "sender": "Account Support <support@account-check.invalid>" if partner else "Rewards Center <offers@rewards-center.invalid>", "body": SAMPLES[1 if partner else 3]["text"]}]), "review_scope": "Training messages · no real inbox searched"},
+        "briefing": {"summary": summary, "action_items": [{"text": "Review the sensor checklist" if partner else "Bring project notes", "source_ids": ["mail:demo"]}]}}
 
 def initialize(cfg):
-    global STATE, PROFILE_STATES, RUNTIME, WORK
+    global STATE, PROFILE_STATES, RUNTIME, WORK, PERSONAL
     RUNTIME = MirrorRuntime(cfg)
     WORK = WorkAssistant(cfg, PRIVATE / "incidents.json", private_write)
+    PERSONAL = PersonalAssistant(cfg)
     PROFILE_STATES = {}
     for profile in RUNTIME.profiles:
         effective = profile_config(cfg, profile["id"])
@@ -251,7 +253,9 @@ def public_state(cfg):
         result["settings"]["tasks"] = []
     if runtime["mode"] == "work":
         runtime["work"]["assistant"] = WORK.assess(runtime)
-    result["build"] = "mirror-welcome-v3"
+    if runtime["mode"] == "personal":
+        result["personal_assistant"] = PERSONAL.snapshot(profile_id, result.get("inbox", {}))
+    result["build"] = "mirror-workflows-v6"
     result["mirror"] = runtime
     result["message_samples"] = SAMPLES if runtime["mode"] == "personal" else []
     return result
@@ -423,7 +427,7 @@ def launch_port():
 def main():
     cfg = load_config()
     if os.environ.get("MIRROR_DEMO") == "1":
-        cfg = dict(cfg, demo=True, sensors={"source": "demo"}, rfid={"source": "none"})
+        cfg = dict(cfg, demo=True, sensors={"source": "demo"}, rfid={"source": "none"}, nemotron={"enabled": False})
     port = launch_port()
     initialize(cfg)
     stop = threading.Event()
@@ -431,6 +435,7 @@ def main():
     for profile in profiles_for(cfg):
         threading.Thread(target=worker, args=(cfg, stop, profile["id"]), daemon=True).start()
     threading.Thread(target=serial_worker, args=(RUNTIME, stop), daemon=True).start()
+    threading.Thread(target=PERSONAL.worker, args=(RUNTIME, lambda pid: personal_snapshot(profile_config(cfg, pid), pid), stop), daemon=True).start()
     threading.Thread(target=WORK.worker, args=(RUNTIME, stop), daemon=True).start()
     threading.Thread(target=rfid_worker, args=(RUNTIME, stop), daemon=True).start()
     print(f"Mirror ready: http://127.0.0.1:{port} — " + ("DEMO" if cfg["demo"] else "LIVE"), flush=True)

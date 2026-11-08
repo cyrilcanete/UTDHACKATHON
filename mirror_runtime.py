@@ -77,6 +77,15 @@ class MirrorRuntime:
         self.profiles = profiles_for(cfg)
         self.active = None
         self.modes = {p["id"]: "personal" for p in self.profiles}
+        encoder = cfg.get("encoder", {})
+        self.detents_per_revolution = encoder.get("detents_per_revolution", 20)
+        self.right_delta = encoder.get("right_delta", -1)
+        if type(self.detents_per_revolution) is not int or not 2 <= self.detents_per_revolution <= 200 or self.detents_per_revolution % 2:
+            raise ValueError("encoder.detents_per_revolution must be an even integer from 2 to 200")
+        if type(self.right_delta) is not int or self.right_delta not in (-1, 1):
+            raise ValueError("encoder.right_delta must be -1 or 1")
+        self.encoder_progress = 0
+        self.half_turn = self.detents_per_revolution // 2
         self.uid_map = {uid: p["id"] for p in self.profiles for uid in p["rfid_uids"]}
         self.options = dict(cfg.get("sensors", {}))
         self.source = self.options.get("source", "demo" if cfg["demo"] else "none")
@@ -116,6 +125,7 @@ class MirrorRuntime:
             if profile_id not in self.modes:
                 raise ValueError("Unknown profile")
             self.active = profile_id
+            self.encoder_progress = 0
             self.modes[profile_id] = "personal"
             self.last_motion = self.clock()
             name = next(p["name"] for p in self.profiles if p["id"] == profile_id)
@@ -125,6 +135,7 @@ class MirrorRuntime:
         if mode == "welcome":
             with self.lock:
                 self.active = None
+                self.encoder_progress = 0
                 self.event = "Scan your card to begin."
                 self.last_motion = self.clock()
             return
@@ -134,6 +145,7 @@ class MirrorRuntime:
             if self.active is None:
                 return  # A knob turn cannot start a private session.
             self.modes[self.active] = mode
+            self.encoder_progress = 0
             self.last_motion = self.clock()
             name = next(p["name"] for p in self.profiles if p["id"] == self.active)
             self.event = f"{mode.title()} mode · {name}"
@@ -154,25 +166,28 @@ class MirrorRuntime:
         if payload.get("type") not in (None, "rfid", "sensors", "mode", "encoder"):
             raise ValueError("Unknown hardware event type")
         mode = payload.get("mode")
+        encoder_delta = None
         if payload.get("type") == "encoder":
-            choices = []
+            # Each delta is a physical detent, not a quadrature electrical edge.
+            if "uid" in payload or "mode" in payload:
+                raise ValueError("Send card and encoder events separately")
+            supplied = [key for key in ("action", "direction", "delta") if key in payload]
+            if len(supplied) != 1:
+                raise ValueError("Send exactly one encoder action, direction or delta")
             if "action" in payload:
                 if payload["action"] not in ("press", "push"):
                     raise ValueError("Unknown encoder action")
-                choices.append("welcome")
-            if "direction" in payload:
-                directions = {"right": "work", "decrement": "work", "left": "personal", "increment": "personal"}
-                if not isinstance(payload["direction"], str) or payload["direction"] not in directions:
+                mode = "welcome"
+            elif "direction" in payload:
+                directions = {"right": self.right_delta, "left": -self.right_delta, "decrement": -1, "increment": 1}
+                value = payload["direction"]
+                if not isinstance(value, str) or value not in directions:
                     raise ValueError("Unknown encoder direction")
-                choices.append(directions[payload["direction"]])
-            if "delta" in payload:
-                delta = payload["delta"]
-                if type(delta) is not int or delta == 0:
-                    raise ValueError("Encoder delta must be a nonzero integer")
-                choices.append("work" if delta < 0 else "personal")
-            if not choices or len(set(choices)) != 1 or "uid" in payload or "mode" in payload:
-                raise ValueError("Use one consistent encoder event")
-            mode = choices[0]
+                encoder_delta = directions[value]
+            else:
+                encoder_delta = payload["delta"]
+                if type(encoder_delta) is not int or not 1 <= abs(encoder_delta) <= 1000:
+                    raise ValueError("Encoder delta must be a nonzero integer detent count")
         if ("mode" in payload or payload.get("type") == "mode") and mode not in ("personal", "work", "welcome"):
             raise ValueError("Mode event needs mode: personal or work")
         fields = {}
@@ -187,7 +202,7 @@ class MirrorRuntime:
                 raise ValueError("motion must be true or false")
             fields["motion"] = payload["motion"]
         uid = normalize_uid(payload["uid"]) if "uid" in payload else None
-        if not fields and uid is None and mode is None:
+        if not fields and uid is None and mode is None and encoder_delta is None:
             raise ValueError("Event needs uid, mode or sensor readings")
         with self.lock:
             now = self.clock()
@@ -203,6 +218,15 @@ class MirrorRuntime:
                     return False
             if mode is not None:
                 self.set_mode(mode)
+            if encoder_delta is not None:
+                self.last_motion = now
+                if self.active is not None:
+                    if self.encoder_progress * encoder_delta < 0:
+                        self.encoder_progress = 0
+                    self.encoder_progress += encoder_delta
+                    if abs(self.encoder_progress) >= self.half_turn:
+                        selected = "personal" if self.encoder_progress * self.right_delta > 0 else "work"
+                        self.set_mode(selected)
         return True
 
     def demo_scenario(self, scenario):
@@ -250,6 +274,8 @@ class MirrorRuntime:
                 "active_profile": self.active,
                 "profiles": [{"id": p["id"], "name": p["name"]} for p in self.profiles],
                 "mode": self.modes[self.active] if self.active else "welcome", "event": self.event, "screen_awake": awake,
+                "encoder": {"detents_per_revolution": self.detents_per_revolution, "half_turn_detents": self.half_turn,
+                            "progress_detents": abs(self.encoder_progress), "right_mode": "personal", "left_mode": "work"},
                 "brightness": brightness,
                 "brightness_status": "dimmed" if dimmed else "full",
                 "rfid_status": self.rfid_status,

@@ -1,0 +1,2034 @@
+{
+  "schema_version": 1,
+  "facility": "ESIF High-Performance Computing Data Center",
+  "source_url": "https://data.nlr.gov/submissions/300",
+  "resource_url": "https://data.nlr.gov/system/files/300/1757105566-esif.influx.buildingData.PUE.combined.csv.zip",
+  "doi": "10.7799/3015212",
+  "attribution": "Struan Clark and Justin Strelka; DOE/NREL/ALLIANCE; NLR Data Catalog",
+  "license_url": "https://data.nlr.gov/node/300/license",
+  "historical": true,
+  "retrieved_at": "2026-11-08T07:28:09.179367+00:00",
+  "archive_sha256": "59e6c0537956b77fb071c6f8211efc3fa4522ca10e5e3d95679aa937627262b1",
+  "source_row_count": 4569543,
+  "source_start": "2015-11-10T03:00:01+00:00",
+  "source_end": "2025-08-29T04:35:08+00:00",
+  "selection": "Latest source row per UTC hour, retaining the last 168 observed hours. Missing values remain null. No interpolation.",
+  "records": [
+    {
+      "timestamp": "2025-08-22T05:59:07+00:00",
+      "source_timestamp": "Thu Aug 21 2025 23:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0622767721126571,
+        "it_power_kw": 2715.908235688031,
+        "cooling_kw": 22.099998950958252,
+        "hvac_kw": 95.48555358317677,
+        "pump_kw": 47.07599809393287,
+        "plug_and_light_kw": 4.47644764476447
+      }
+    },
+    {
+      "timestamp": "2025-08-22T06:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 00:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.060937574873233,
+        "it_power_kw": 2668.594346465051,
+        "cooling_kw": 19.299999237060547,
+        "hvac_kw": 95.07849801773294,
+        "pump_kw": 46.51099772192538,
+        "plug_and_light_kw": 1.728172817281724
+      }
+    },
+    {
+      "timestamp": "2025-08-22T07:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.061232914424498,
+        "it_power_kw": 2640.6606174724698,
+        "cooling_kw": 15.299999475479126,
+        "hvac_kw": 95.41790250464605,
+        "pump_kw": 46.524998389184475,
+        "plug_and_light_kw": 4.452445244524438
+      }
+    },
+    {
+      "timestamp": "2025-08-22T08:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 02:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0587050470442114,
+        "it_power_kw": 2640.608223972857,
+        "cooling_kw": 12.519999384880066,
+        "hvac_kw": 95.15392636629552,
+        "pump_kw": 46.28699865192175,
+        "plug_and_light_kw": 1.0561056105610478
+      }
+    },
+    {
+      "timestamp": "2025-08-22T09:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 03:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0588887555144382,
+        "it_power_kw": 2635.2512374501825,
+        "cooling_kw": 11.709999561309814,
+        "hvac_kw": 95.43356142968122,
+        "pump_kw": 46.98699923977256,
+        "plug_and_light_kw": 1.0561056105610478
+      }
+    },
+    {
+      "timestamp": "2025-08-22T10:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 04:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0578999785799097,
+        "it_power_kw": 2654.864531134665,
+        "cooling_kw": 11.479999542236328,
+        "hvac_kw": 94.63649788198336,
+        "pump_kw": 46.56799885071814,
+        "plug_and_light_kw": 1.032103210321031
+      }
+    },
+    {
+      "timestamp": "2025-08-22T11:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 05:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0583650838235574,
+        "it_power_kw": 2646.094893740714,
+        "cooling_kw": 10.889999508857727,
+        "hvac_kw": 95.50544917948224,
+        "pump_kw": 47.01199837960303,
+        "plug_and_light_kw": 1.032103210321031
+      }
+    },
+    {
+      "timestamp": "2025-08-22T12:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 06:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0605946736562315,
+        "it_power_kw": 2632.073660717607,
+        "cooling_kw": 14.709999084472656,
+        "hvac_kw": 95.36154086424943,
+        "pump_kw": 48.36199895106256,
+        "plug_and_light_kw": 1.0561056105610478
+      }
+    },
+    {
+      "timestamp": "2025-08-22T13:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 07:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0657601233953322,
+        "it_power_kw": 2520.4479795020225,
+        "cooling_kw": 18.019999027252197,
+        "hvac_kw": 95.4975274975091,
+        "pump_kw": 47.774998374283314,
+        "plug_and_light_kw": 4.452445244524453
+      }
+    },
+    {
+      "timestamp": "2025-08-22T14:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 08:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0653217158158927,
+        "it_power_kw": 2542.496623764336,
+        "cooling_kw": 20.549999237060547,
+        "hvac_kw": 95.64007167793575,
+        "pump_kw": 48.16199818812311,
+        "plug_and_light_kw": 1.728172817281724
+      }
+    },
+    {
+      "timestamp": "2025-08-22T15:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 09:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.072993948626235,
+        "it_power_kw": 2538.0795156100394,
+        "cooling_kw": 35.8999981880188,
+        "hvac_kw": 95.54097249172305,
+        "pump_kw": 49.05899864435196,
+        "plug_and_light_kw": 4.764476447644774
+      }
+    },
+    {
+      "timestamp": "2025-08-22T16:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 10:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0778548949039783,
+        "it_power_kw": 2510.4272991513017,
+        "cooling_kw": 46.259997844696045,
+        "hvac_kw": 95.63458798669534,
+        "pump_kw": 48.861998461186886,
+        "plug_and_light_kw": 4.692469246924709
+      }
+    },
+    {
+      "timestamp": "2025-08-22T17:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 11:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0800996453186367,
+        "it_power_kw": 2502.40084595716,
+        "cooling_kw": 51.6499981880188,
+        "hvac_kw": 96.1359543885344,
+        "pump_kw": 47.96299838274717,
+        "plug_and_light_kw": 4.692469246924694
+      }
+    },
+    {
+      "timestamp": "2025-08-22T18:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 12:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.084812128591639,
+        "it_power_kw": 2467.076216917336,
+        "cooling_kw": 61.19999837875366,
+        "hvac_kw": 94.4535216553655,
+        "pump_kw": 48.915998473763466,
+        "plug_and_light_kw": 4.6684668466846775
+      }
+    },
+    {
+      "timestamp": "2025-08-22T19:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 13:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.086589445639663,
+        "it_power_kw": 2425.016371153414,
+        "cooling_kw": 61.75999879837036,
+        "hvac_kw": 94.29335962344673,
+        "pump_kw": 49.25899797677994,
+        "plug_and_light_kw": 4.6684668466846775
+      }
+    },
+    {
+      "timestamp": "2025-08-22T20:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 14:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0866362643565464,
+        "it_power_kw": 2400.2813680101035,
+        "cooling_kw": 60.84999895095825,
+        "hvac_kw": 93.78794687036495,
+        "pump_kw": 48.64499846100807,
+        "plug_and_light_kw": 4.668466846684662
+      }
+    },
+    {
+      "timestamp": "2025-08-22T21:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0815280891873524,
+        "it_power_kw": 2514.349331008315,
+        "cooling_kw": 61.339998722076416,
+        "hvac_kw": 93.68389947550536,
+        "pump_kw": 47.961997888982296,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-22T22:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 16:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.082077151099601,
+        "it_power_kw": 2502.6045626214145,
+        "cooling_kw": 62.199997425079346,
+        "hvac_kw": 93.7354574682972,
+        "pump_kw": 47.466997515410185,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-22T23:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 17:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0793242020279097,
+        "it_power_kw": 2495.8098680544495,
+        "cooling_kw": 56.67999839782715,
+        "hvac_kw": 93.17392862027414,
+        "pump_kw": 46.11999875865877,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T00:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 18:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0761697181117633,
+        "it_power_kw": 2460.6705043019056,
+        "cooling_kw": 45.96999788284302,
+        "hvac_kw": 93.31738218238358,
+        "pump_kw": 46.13699819333851,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T01:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 19:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0730975552374487,
+        "it_power_kw": 2440.32388030082,
+        "cooling_kw": 36.969998359680176,
+        "hvac_kw": 93.69350800688106,
+        "pump_kw": 45.6779992505908,
+        "plug_and_light_kw": 2.040204020402045
+      }
+    },
+    {
+      "timestamp": "2025-08-23T02:59:07+00:00",
+      "source_timestamp": "Fri Aug 22 2025 20:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0736145855834667,
+        "it_power_kw": 2434.7108341274857,
+        "cooling_kw": 37.05999803543091,
+        "hvac_kw": 93.69903214531398,
+        "pump_kw": 46.4669984690845,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T03:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 21:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0747434728962253,
+        "it_power_kw": 2414.1408087556956,
+        "cooling_kw": 37.46999788284302,
+        "hvac_kw": 94.17706920792067,
+        "pump_kw": 46.76599819585681,
+        "plug_and_light_kw": 2.028202820282037
+      }
+    },
+    {
+      "timestamp": "2025-08-23T04:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 22:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0755594787389635,
+        "it_power_kw": 2405.299099421859,
+        "cooling_kw": 39.76999807357788,
+        "hvac_kw": 93.5489540142641,
+        "pump_kw": 46.4679984562099,
+        "plug_and_light_kw": 1.9561956195619712
+      }
+    },
+    {
+      "timestamp": "2025-08-23T05:59:08+00:00",
+      "source_timestamp": "Fri Aug 22 2025 23:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0743973881509348,
+        "it_power_kw": 2401.4432664035558,
+        "cooling_kw": 36.10999774932861,
+        "hvac_kw": 94.39591035680088,
+        "pump_kw": 46.150998286902905,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T06:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 00:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0737800068856733,
+        "it_power_kw": 2409.800329312861,
+        "cooling_kw": 34.0199990272522,
+        "hvac_kw": 94.5268896596003,
+        "pump_kw": 47.26799818314612,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-23T07:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0737607785554495,
+        "it_power_kw": 2398.0105607017276,
+        "cooling_kw": 32.999998807907104,
+        "hvac_kw": 95.14493055487152,
+        "pump_kw": 46.753998558968306,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-23T08:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 02:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.073263766103119,
+        "it_power_kw": 2375.058669673562,
+        "cooling_kw": 30.88999915122986,
+        "hvac_kw": 94.32854807672375,
+        "pump_kw": 46.80699760839343,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-23T09:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 03:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0737397975024912,
+        "it_power_kw": 2368.695555903554,
+        "cooling_kw": 30.929998874664307,
+        "hvac_kw": 95.04293160488247,
+        "pump_kw": 46.665997337549925,
+        "plug_and_light_kw": 2.028202820282037
+      }
+    },
+    {
+      "timestamp": "2025-08-23T10:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 04:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0743486332525076,
+        "it_power_kw": 2372.4819434242845,
+        "cooling_kw": 32.85999870300293,
+        "hvac_kw": 94.91058810231841,
+        "pump_kw": 46.56799788400531,
+        "plug_and_light_kw": 2.0522052205220533
+      }
+    },
+    {
+      "timestamp": "2025-08-23T11:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 05:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0733296858147447,
+        "it_power_kw": 2379.5436198509333,
+        "cooling_kw": 31.41999912261963,
+        "hvac_kw": 94.66998965849874,
+        "pump_kw": 46.420999225229025,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-23T12:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 06:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0722533659844529,
+        "it_power_kw": 2382.2151343661544,
+        "cooling_kw": 29.059998750686646,
+        "hvac_kw": 94.48786461312469,
+        "pump_kw": 46.570998173207045,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T13:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 07:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.069728320396175,
+        "it_power_kw": 2399.3796485884786,
+        "cooling_kw": 24.819998741149902,
+        "hvac_kw": 94.6105150714343,
+        "pump_kw": 45.86999865621328,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T14:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 08:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0699494394884912,
+        "it_power_kw": 2388.9776705697177,
+        "cooling_kw": 24.78999900817871,
+        "hvac_kw": 94.28545044950603,
+        "pump_kw": 46.02799912914634,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T15:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 09:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0704153422239413,
+        "it_power_kw": 2382.2620156329276,
+        "cooling_kw": 24.029999256134033,
+        "hvac_kw": 94.42059485120117,
+        "pump_kw": 47.268998170271516,
+        "plug_and_light_kw": 2.028202820282037
+      }
+    },
+    {
+      "timestamp": "2025-08-23T16:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 10:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.073883587585797,
+        "it_power_kw": 2345.6927618163227,
+        "cooling_kw": 29.319998502731323,
+        "hvac_kw": 94.42099942363767,
+        "pump_kw": 47.562998270615935,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T17:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 11:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0742537131044934,
+        "it_power_kw": 2320.250545335889,
+        "cooling_kw": 29.689998626708984,
+        "hvac_kw": 93.85002349442209,
+        "pump_kw": 46.766998182982206,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-23T18:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 12:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0756560814982594,
+        "it_power_kw": 2307.755489290059,
+        "cooling_kw": 30.409998416900635,
+        "hvac_kw": 94.11554062908745,
+        "pump_kw": 48.065997909754515,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T19:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 13:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0774487299265212,
+        "it_power_kw": 2338.4194035730957,
+        "cooling_kw": 37.19999837875366,
+        "hvac_kw": 94.34041577285784,
+        "pump_kw": 47.562998270615935,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T20:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 14:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0781518524589053,
+        "it_power_kw": 2380.548082142472,
+        "cooling_kw": 42.47999811172485,
+        "hvac_kw": 94.55104077598773,
+        "pump_kw": 46.96099837869406,
+        "plug_and_light_kw": 2.0522052205220533
+      }
+    },
+    {
+      "timestamp": "2025-08-23T21:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0815946312719187,
+        "it_power_kw": 2403.5060955486892,
+        "cooling_kw": 51.49999809265137,
+        "hvac_kw": 94.74699569854965,
+        "pump_kw": 47.8619994148612,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-23T22:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 16:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0849873962269085,
+        "it_power_kw": 2396.3224100943803,
+        "cooling_kw": 60.02999830245972,
+        "hvac_kw": 94.40199924305047,
+        "pump_kw": 47.160998187959194,
+        "plug_and_light_kw": 2.0642064206420763
+      }
+    },
+    {
+      "timestamp": "2025-08-23T23:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 17:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0852592642894727,
+        "it_power_kw": 2392.6562921586633,
+        "cooling_kw": 61.0699987411499,
+        "hvac_kw": 93.80191523271122,
+        "pump_kw": 47.095998372882605,
+        "plug_and_light_kw": 2.028202820282037
+      }
+    },
+    {
+      "timestamp": "2025-08-24T00:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 18:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0813092285490782,
+        "it_power_kw": 2409.8577038763165,
+        "cooling_kw": 54.87999725341797,
+        "hvac_kw": 93.27647513871078,
+        "pump_kw": 45.782998003065586,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-24T01:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 19:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0762807469130253,
+        "it_power_kw": 2413.9925710288285,
+        "cooling_kw": 41.55999803543091,
+        "hvac_kw": 94.41595684586078,
+        "pump_kw": 46.1369986589998,
+        "plug_and_light_kw": 2.028202820282037
+      }
+    },
+    {
+      "timestamp": "2025-08-24T02:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 20:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0730865615649743,
+        "it_power_kw": 2421.9507743151785,
+        "cooling_kw": 35.57999897003174,
+        "hvac_kw": 93.03385488147087,
+        "pump_kw": 46.36999770253897,
+        "plug_and_light_kw": 2.0282028202820364
+      }
+    },
+    {
+      "timestamp": "2025-08-24T03:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 21:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0703014582658938,
+        "it_power_kw": 2423.7487153199318,
+        "cooling_kw": 29.66999888420105,
+        "hvac_kw": 92.58487453499406,
+        "pump_kw": 46.15799771808088,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-24T04:59:07+00:00",
+      "source_timestamp": "Sat Aug 23 2025 22:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.067970509394252,
+        "it_power_kw": 2414.9478505684733,
+        "cooling_kw": 23.559999465942383,
+        "hvac_kw": 92.76803445897106,
+        "pump_kw": 45.77699761837721,
+        "plug_and_light_kw": 2.040204020402045
+      }
+    },
+    {
+      "timestamp": "2025-08-24T05:59:08+00:00",
+      "source_timestamp": "Sat Aug 23 2025 23:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0655809317072589,
+        "it_power_kw": 2410.695206493318,
+        "cooling_kw": 17.919999361038208,
+        "hvac_kw": 92.44643502877052,
+        "pump_kw": 45.67699809372425,
+        "plug_and_light_kw": 2.0522052205220533
+      }
+    },
+    {
+      "timestamp": "2025-08-24T06:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 00:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0642318488123594,
+        "it_power_kw": 2426.3220841061475,
+        "cooling_kw": 13.889999508857727,
+        "hvac_kw": 93.98295526348655,
+        "pump_kw": 45.969998084008694,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-24T07:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0650514020751107,
+        "it_power_kw": 2421.4924317237737,
+        "cooling_kw": 13.239999413490295,
+        "hvac_kw": 92.96504599680038,
+        "pump_kw": 46.98399914428592,
+        "plug_and_light_kw": 4.332433243324325
+      }
+    },
+    {
+      "timestamp": "2025-08-24T08:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 02:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.062585291730563,
+        "it_power_kw": 2428.032719173849,
+        "cooling_kw": 11.369999527931213,
+        "hvac_kw": 93.47095972102846,
+        "pump_kw": 45.32999799400568,
+        "plug_and_light_kw": 1.7881788178817803
+      }
+    },
+    {
+      "timestamp": "2025-08-24T09:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 03:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.062975827410741,
+        "it_power_kw": 2435.827507883966,
+        "cooling_kw": 11.209999561309814,
+        "hvac_kw": 93.76808300027861,
+        "pump_kw": 46.70399856008589,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-24T10:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 04:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0624370365136435,
+        "it_power_kw": 2440.9877418372034,
+        "cooling_kw": 10.899999618530273,
+        "hvac_kw": 93.46786338768794,
+        "pump_kw": 46.25199894234538,
+        "plug_and_light_kw": 1.7881788178817803
+      }
+    },
+    {
+      "timestamp": "2025-08-24T11:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 05:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0620660341423775,
+        "it_power_kw": 2433.210672259748,
+        "cooling_kw": 10.479999661445618,
+        "hvac_kw": 93.11056239609387,
+        "pump_kw": 45.664998184889555,
+        "plug_and_light_kw": 1.7641764176417638
+      }
+    },
+    {
+      "timestamp": "2025-08-24T12:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 06:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0628947858330369,
+        "it_power_kw": 2451.01527132529,
+        "cooling_kw": 12.929999470710754,
+        "hvac_kw": 92.7659141826037,
+        "pump_kw": 46.767997693270445,
+        "plug_and_light_kw": 1.6921692169216986
+      }
+    },
+    {
+      "timestamp": "2025-08-24T13:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 07:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0642820348949718,
+        "it_power_kw": 2449.4495418667198,
+        "cooling_kw": 15.029999017715454,
+        "hvac_kw": 93.62342914134231,
+        "pump_kw": 47.06199874728918,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-24T14:59:08+00:00",
+      "source_timestamp": "Sun Aug 24 2025 08:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0711458660270776,
+        "it_power_kw": 2436.9092667669656,
+        "cooling_kw": 29.429998636245728,
+        "hvac_kw": 93.37185206585168,
+        "pump_kw": 48.85799789428711,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-24T15:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 09:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0755946412441653,
+        "it_power_kw": 2435.221167913735,
+        "cooling_kw": 40.999998569488525,
+        "hvac_kw": 93.31250159182193,
+        "pump_kw": 48.060998760163784,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-24T16:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 10:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0779391434723566,
+        "it_power_kw": 2449.850572948873,
+        "cooling_kw": 48.199997901916504,
+        "hvac_kw": 93.63708491039243,
+        "pump_kw": 47.361998461186886,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-24T17:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 11:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0806327768189632,
+        "it_power_kw": 2448.8817021424175,
+        "cooling_kw": 54.10999822616577,
+        "hvac_kw": 93.54796218454693,
+        "pump_kw": 48.061997316777706,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-24T18:59:08+00:00",
+      "source_timestamp": "Sun Aug 24 2025 12:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0768228267374447,
+        "it_power_kw": 2428.46601909107,
+        "cooling_kw": 45.73999786376953,
+        "hvac_kw": 93.5614515658763,
+        "pump_kw": 45.49599837511778,
+        "plug_and_light_kw": 1.7641764176417638
+      }
+    },
+    {
+      "timestamp": "2025-08-24T19:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 13:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.077853811760817,
+        "it_power_kw": 2421.332440445125,
+        "cooling_kw": 43.2599983215332,
+        "hvac_kw": 93.42352432793915,
+        "pump_kw": 47.44599933549762,
+        "plug_and_light_kw": 4.380438043804373
+      }
+    },
+    {
+      "timestamp": "2025-08-24T20:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 14:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0781743481673887,
+        "it_power_kw": 2416.8928389505745,
+        "cooling_kw": 47.00999736785889,
+        "hvac_kw": 93.55685297700741,
+        "pump_kw": 46.63199791312218,
+        "plug_and_light_kw": 1.7401740174017322
+      }
+    },
+    {
+      "timestamp": "2025-08-24T21:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0808293349378615,
+        "it_power_kw": 2396.537426066339,
+        "cooling_kw": 50.55999803543091,
+        "hvac_kw": 93.74435595857963,
+        "pump_kw": 47.66599829122424,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-24T22:59:08+00:00",
+      "source_timestamp": "Sun Aug 24 2025 16:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.081117400497022,
+        "it_power_kw": 2385.7957368165853,
+        "cooling_kw": 51.8199987411499,
+        "hvac_kw": 93.70237686906798,
+        "pump_kw": 46.266998659819365,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-24T23:59:08+00:00",
+      "source_timestamp": "Sun Aug 24 2025 17:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.077860541036869,
+        "it_power_kw": 2398.3594541429875,
+        "cooling_kw": 46.27999830245972,
+        "hvac_kw": 93.64439428902284,
+        "pump_kw": 45.072998091578484,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-25T00:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 18:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.071684798728697,
+        "it_power_kw": 2390.7051172227266,
+        "cooling_kw": 30.369998693466187,
+        "hvac_kw": 93.71804674557094,
+        "pump_kw": 45.572998091578484,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-25T01:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 19:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0672884345218392,
+        "it_power_kw": 2393.4981199631093,
+        "cooling_kw": 19.6999990940094,
+        "hvac_kw": 94.2315715742761,
+        "pump_kw": 45.40699923783541,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-25T02:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 20:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0657013338193333,
+        "it_power_kw": 2386.8699980449082,
+        "cooling_kw": 15.529999375343323,
+        "hvac_kw": 93.78037085741092,
+        "pump_kw": 45.76999827474356,
+        "plug_and_light_kw": 1.7401740174017322
+      }
+    },
+    {
+      "timestamp": "2025-08-25T03:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 21:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0691398590294245,
+        "it_power_kw": 2378.759107936561,
+        "cooling_kw": 21.869998931884766,
+        "hvac_kw": 93.71890111059763,
+        "pump_kw": 47.161997728049755,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-25T04:59:07+00:00",
+      "source_timestamp": "Sun Aug 24 2025 22:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.073212938337005,
+        "it_power_kw": 2371.954661514699,
+        "cooling_kw": 31.279999017715454,
+        "hvac_kw": 94.19860090698764,
+        "pump_kw": 46.46299882978201,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-25T05:59:08+00:00",
+      "source_timestamp": "Sun Aug 24 2025 23:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0752051018266848,
+        "it_power_kw": 2364.377022450149,
+        "cooling_kw": 35.50999927520752,
+        "hvac_kw": 93.80104335771118,
+        "pump_kw": 46.76199807971716,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-25T06:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 00:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0736794466468365,
+        "it_power_kw": 2353.7244789850115,
+        "cooling_kw": 32.9599986076355,
+        "hvac_kw": 93.934948567774,
+        "pump_kw": 44.809998378157616,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-25T07:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0668572846237183,
+        "it_power_kw": 2349.03116701293,
+        "cooling_kw": 13.799999475479126,
+        "hvac_kw": 93.97240712113216,
+        "pump_kw": 44.87299828231335,
+        "plug_and_light_kw": 4.404440444044406
+      }
+    },
+    {
+      "timestamp": "2025-08-25T08:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 02:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0656893856608303,
+        "it_power_kw": 2346.727162564576,
+        "cooling_kw": 12.019999384880066,
+        "hvac_kw": 93.92789470475805,
+        "pump_kw": 46.466997515410185,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-25T09:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 03:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0640656958145112,
+        "it_power_kw": 2339.952515532732,
+        "cooling_kw": 9.049999475479126,
+        "hvac_kw": 94.10651679772951,
+        "pump_kw": 45.037998190149665,
+        "plug_and_light_kw": 1.7161716171617152
+      }
+    },
+    {
+      "timestamp": "2025-08-25T10:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 04:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0675243755369928,
+        "it_power_kw": 2327.58396157068,
+        "cooling_kw": 13.699999809265137,
+        "hvac_kw": 94.26548038169355,
+        "pump_kw": 47.46299930661917,
+        "plug_and_light_kw": 1.7401740174017468
+      }
+    },
+    {
+      "timestamp": "2025-08-25T11:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 05:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0679388001554784,
+        "it_power_kw": 2321.7382391495703,
+        "cooling_kw": 13.62999951839447,
+        "hvac_kw": 95.94794207196546,
+        "pump_kw": 46.46599943563342,
+        "plug_and_light_kw": 1.6921692169216986
+      }
+    },
+    {
+      "timestamp": "2025-08-25T12:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 06:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0688397366224074,
+        "it_power_kw": 2304.1366344332696,
+        "cooling_kw": 15.059998989105225,
+        "hvac_kw": 95.72498527596217,
+        "pump_kw": 46.06699837371707,
+        "plug_and_light_kw": 1.7641764176417638
+      }
+    },
+    {
+      "timestamp": "2025-08-25T13:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 07:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0697098314315154,
+        "it_power_kw": 2290.633474348724,
+        "cooling_kw": 14.999999284744263,
+        "hvac_kw": 95.67250188310767,
+        "pump_kw": 47.266998182982206,
+        "plug_and_light_kw": 1.7401740174017322
+      }
+    },
+    {
+      "timestamp": "2025-08-25T14:59:09+00:00",
+      "source_timestamp": "Mon Aug 25 2025 08:59:09 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.072256157127705,
+        "it_power_kw": 2295.782466947973,
+        "cooling_kw": 18.599998950958252,
+        "hvac_kw": 95.67895640988885,
+        "pump_kw": 46.960998855531216,
+        "plug_and_light_kw": 4.644464446444646
+      }
+    },
+    {
+      "timestamp": "2025-08-25T15:59:09+00:00",
+      "source_timestamp": "Mon Aug 25 2025 09:59:09 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0743489689660877,
+        "it_power_kw": 2339.0628511460422,
+        "cooling_kw": 24.78999924659729,
+        "hvac_kw": 97.06144340427467,
+        "pump_kw": 47.36299943178892,
+        "plug_and_light_kw": 4.692469246924709
+      }
+    },
+    {
+      "timestamp": "2025-08-25T16:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 10:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.076084882551614,
+        "it_power_kw": 2332.408575009167,
+        "cooling_kw": 28.66999888420105,
+        "hvac_kw": 96.66156885920714,
+        "pump_kw": 47.4609979018569,
+        "plug_and_light_kw": 4.668466846684662
+      }
+    },
+    {
+      "timestamp": "2025-08-25T17:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 11:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0750097706023807,
+        "it_power_kw": 2468.2724039326313,
+        "cooling_kw": 36.039998054504395,
+        "hvac_kw": 96.82607978472646,
+        "pump_kw": 47.561997316777706,
+        "plug_and_light_kw": 4.7164716471647266
+      }
+    },
+    {
+      "timestamp": "2025-08-25T18:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 12:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0755497221493389,
+        "it_power_kw": 2476.3139054945113,
+        "cooling_kw": 37.249998569488525,
+        "hvac_kw": 97.54437782722754,
+        "pump_kw": 47.76599867269397,
+        "plug_and_light_kw": 4.524452445244547
+      }
+    },
+    {
+      "timestamp": "2025-08-25T19:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 13:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0764096612170098,
+        "it_power_kw": 2451.247377726436,
+        "cooling_kw": 37.72999811172485,
+        "hvac_kw": 97.11350645320087,
+        "pump_kw": 47.66699827834964,
+        "plug_and_light_kw": 4.7884788478848055
+      }
+    },
+    {
+      "timestamp": "2025-08-25T20:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 14:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.080556809169077,
+        "it_power_kw": 2440.9406078965067,
+        "cooling_kw": 47.50999879837036,
+        "hvac_kw": 97.21094527545537,
+        "pump_kw": 47.46099742501974,
+        "plug_and_light_kw": 4.452445244524467
+      }
+    },
+    {
+      "timestamp": "2025-08-25T21:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0793767980712041,
+        "it_power_kw": 2465.6933141607046,
+        "cooling_kw": 50.04999828338623,
+        "hvac_kw": 95.54739831452534,
+        "pump_kw": 45.66899846121669,
+        "plug_and_light_kw": 4.452445244524453
+      }
+    },
+    {
+      "timestamp": "2025-08-25T22:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 16:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0801987037330916,
+        "it_power_kw": 2401.4133105288743,
+        "cooling_kw": 48.38999795913696,
+        "hvac_kw": 95.85307085435629,
+        "pump_kw": 46.66699780151248,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-25T23:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 17:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.079618894075377,
+        "it_power_kw": 2436.92883006227,
+        "cooling_kw": 49.60999822616577,
+        "hvac_kw": 96.04341243495232,
+        "pump_kw": 46.66799731180072,
+        "plug_and_light_kw": 1.7041704170417071
+      }
+    },
+    {
+      "timestamp": "2025-08-26T00:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 18:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0793860378639482,
+        "it_power_kw": 2412.8455643969774,
+        "cooling_kw": 47.36999845504761,
+        "hvac_kw": 96.39608438538195,
+        "pump_kw": 46.099998477846384,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-26T01:59:08+00:00",
+      "source_timestamp": "Mon Aug 25 2025 19:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.07617574910508,
+        "it_power_kw": 2462.459524835944,
+        "cooling_kw": 42.689998149871826,
+        "hvac_kw": 96.40953516953519,
+        "pump_kw": 46.799997609108686,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-26T02:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 20:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0762833893034784,
+        "it_power_kw": 2427.6873277033565,
+        "cooling_kw": 38.629998207092285,
+        "hvac_kw": 98.71105293401045,
+        "pump_kw": 46.170998368412256,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-26T03:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 21:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0747822536296177,
+        "it_power_kw": 2432.598297231555,
+        "cooling_kw": 35.7099986076355,
+        "hvac_kw": 98.46801533424113,
+        "pump_kw": 46.032998483628035,
+        "plug_and_light_kw": 1.7041704170417071
+      }
+    },
+    {
+      "timestamp": "2025-08-26T04:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 22:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0714821145702607,
+        "it_power_kw": 2449.748839950979,
+        "cooling_kw": 29.38999843597412,
+        "hvac_kw": 98.12905752318991,
+        "pump_kw": 45.86599846929312,
+        "plug_and_light_kw": 1.728172817281724
+      }
+    },
+    {
+      "timestamp": "2025-08-26T05:59:07+00:00",
+      "source_timestamp": "Mon Aug 25 2025 23:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0693938028079237,
+        "it_power_kw": 2458.2415043555498,
+        "cooling_kw": 25.10999870300293,
+        "hvac_kw": 98.6815621678206,
+        "pump_kw": 45.11499731987715,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-26T06:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 00:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0681161474331318,
+        "it_power_kw": 2457.0860844584704,
+        "cooling_kw": 23.31999921798706,
+        "hvac_kw": 95.72307440800859,
+        "pump_kw": 46.66799874231219,
+        "plug_and_light_kw": 1.6561656165616587
+      }
+    },
+    {
+      "timestamp": "2025-08-26T07:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0701757026229692,
+        "it_power_kw": 2452.248689189613,
+        "cooling_kw": 24.369999170303345,
+        "hvac_kw": 97.04985805529326,
+        "pump_kw": 46.46799750253558,
+        "plug_and_light_kw": 4.200420042004218
+      }
+    },
+    {
+      "timestamp": "2025-08-26T08:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 02:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0666269672920943,
+        "it_power_kw": 2433.4456808974146,
+        "cooling_kw": 17.719999313354492,
+        "hvac_kw": 97.6000010973986,
+        "pump_kw": 45.744998566806316,
+        "plug_and_light_kw": 1.0681068106810707
+      }
+    },
+    {
+      "timestamp": "2025-08-26T09:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 03:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0656097497516221,
+        "it_power_kw": 2403.174390973687,
+        "cooling_kw": 13.399999499320984,
+        "hvac_kw": 97.61957199798567,
+        "pump_kw": 45.643998093903065,
+        "plug_and_light_kw": 1.008100810081014
+      }
+    },
+    {
+      "timestamp": "2025-08-26T10:59:08+00:00",
+      "source_timestamp": "Tue Aug 26 2025 04:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0650033397192242,
+        "it_power_kw": 2427.0218336943985,
+        "cooling_kw": 12.329999566078186,
+        "hvac_kw": 97.7604265710651,
+        "pump_kw": 46.66599781438708,
+        "plug_and_light_kw": 1.008100810081014
+      }
+    },
+    {
+      "timestamp": "2025-08-26T11:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 05:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0651362548938832,
+        "it_power_kw": 2446.2798405455947,
+        "cooling_kw": 14.159999370574951,
+        "hvac_kw": 97.68140618540099,
+        "pump_kw": 46.467998469248414,
+        "plug_and_light_kw": 1.032103210321031
+      }
+    },
+    {
+      "timestamp": "2025-08-26T12:59:08+00:00",
+      "source_timestamp": "Tue Aug 26 2025 06:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0637631530812393,
+        "it_power_kw": 2450.9387130579353,
+        "cooling_kw": 12.239999651908875,
+        "hvac_kw": 97.4234820940292,
+        "pump_kw": 45.60799779742956,
+        "plug_and_light_kw": 1.008100810081014
+      }
+    },
+    {
+      "timestamp": "2025-08-26T13:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 07:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0657108099206285,
+        "it_power_kw": 2444.8728266831636,
+        "cooling_kw": 12.59999966621399,
+        "hvac_kw": 99.97947522111205,
+        "pump_kw": 47.06699789687991,
+        "plug_and_light_kw": 1.008100810081014
+      }
+    },
+    {
+      "timestamp": "2025-08-26T14:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 08:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.067290350814089,
+        "it_power_kw": 2468.420682050884,
+        "cooling_kw": 14.169999361038208,
+        "hvac_kw": 100.559452329558,
+        "pump_kw": 46.9429991170764,
+        "plug_and_light_kw": 4.428442844284437
+      }
+    },
+    {
+      "timestamp": "2025-08-26T15:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 09:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0705366565164245,
+        "it_power_kw": 2426.8239139532448,
+        "cooling_kw": 18.82999897003174,
+        "hvac_kw": 100.32158149438709,
+        "pump_kw": 47.359997533261776,
+        "plug_and_light_kw": 4.668466846684693
+      }
+    },
+    {
+      "timestamp": "2025-08-26T16:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 10:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0729153763491366,
+        "it_power_kw": 2393.460267687261,
+        "cooling_kw": 22.599998950958252,
+        "hvac_kw": 99.93658693717954,
+        "pump_kw": 47.266998659819365,
+        "plug_and_light_kw": 4.716471647164726
+      }
+    },
+    {
+      "timestamp": "2025-08-26T17:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 11:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0752769537654778,
+        "it_power_kw": 2445.0221496263744,
+        "cooling_kw": 30.339998722076416,
+        "hvac_kw": 100.36035315603338,
+        "pump_kw": 48.660998187959194,
+        "plug_and_light_kw": 4.692469246924709
+      }
+    },
+    {
+      "timestamp": "2025-08-26T18:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 12:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0808161301584265,
+        "it_power_kw": 2442.363886417031,
+        "cooling_kw": 44.129998207092285,
+        "hvac_kw": 100.23390465813563,
+        "pump_kw": 48.06199922412634,
+        "plug_and_light_kw": 4.9564956495649675
+      }
+    },
+    {
+      "timestamp": "2025-08-26T19:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 13:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.083695212295045,
+        "it_power_kw": 2434.7554279293417,
+        "cooling_kw": 51.349998474121094,
+        "hvac_kw": 100.56891622725661,
+        "pump_kw": 47.26199807971716,
+        "plug_and_light_kw": 4.5964596459645986
+      }
+    },
+    {
+      "timestamp": "2025-08-26T20:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 14:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0859716896896692,
+        "it_power_kw": 2445.9273935076594,
+        "cooling_kw": 57.80999803543091,
+        "hvac_kw": 100.68705263425655,
+        "pump_kw": 47.16299816220999,
+        "plug_and_light_kw": 4.620462046204629
+      }
+    },
+    {
+      "timestamp": "2025-08-26T21:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.085922205698551,
+        "it_power_kw": 2311.3397990084886,
+        "cooling_kw": 48.3199987411499,
+        "hvac_kw": 100.42897607956792,
+        "pump_kw": 45.44199838489294,
+        "plug_and_light_kw": 4.404440444044405
+      }
+    },
+    {
+      "timestamp": "2025-08-26T22:59:08+00:00",
+      "source_timestamp": "Tue Aug 26 2025 16:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0899104061046436,
+        "it_power_kw": 2230.2257309984566,
+        "cooling_kw": 48.64999771118164,
+        "hvac_kw": 100.75606033887895,
+        "pump_kw": 46.66199788451195,
+        "plug_and_light_kw": 4.452445244524453
+      }
+    },
+    {
+      "timestamp": "2025-08-26T23:59:08+00:00",
+      "source_timestamp": "Tue Aug 26 2025 17:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0863750879270573,
+        "it_power_kw": 2403.8308891758325,
+        "cooling_kw": 58.67999792098999,
+        "hvac_kw": 100.80993962101533,
+        "pump_kw": 46.460998855531216,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T00:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 18:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0815848238634664,
+        "it_power_kw": 2415.0286898257136,
+        "cooling_kw": 49.36999797821045,
+        "hvac_kw": 100.43552601095928,
+        "pump_kw": 45.54399827867746,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T01:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 19:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.081148524581726,
+        "it_power_kw": 2356.599030327916,
+        "cooling_kw": 42.719998836517334,
+        "hvac_kw": 100.71736919787408,
+        "pump_kw": 46.116998290643096,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T02:59:08+00:00",
+      "source_timestamp": "Tue Aug 26 2025 20:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.078717994833659,
+        "it_power_kw": 2385.5871602827906,
+        "cooling_kw": 39.38999843597412,
+        "hvac_kw": 100.41947275975238,
+        "pump_kw": 46.298998545855284,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T03:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 21:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0755184707010277,
+        "it_power_kw": 2376.5471995758417,
+        "cooling_kw": 32.749998569488525,
+        "hvac_kw": 100.11404471360795,
+        "pump_kw": 44.92899876087904,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T04:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 22:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0736312672842239,
+        "it_power_kw": 2381.5445386435986,
+        "cooling_kw": 26.53999924659729,
+        "hvac_kw": 101.30697721877235,
+        "pump_kw": 45.82899799197912,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T05:59:07+00:00",
+      "source_timestamp": "Tue Aug 26 2025 23:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0714116159946605,
+        "it_power_kw": 2339.9864567196964,
+        "cooling_kw": 19.299999237060547,
+        "hvac_kw": 100.99704596532197,
+        "pump_kw": 45.10099866054952,
+        "plug_and_light_kw": 1.7041704170417071
+      }
+    },
+    {
+      "timestamp": "2025-08-27T06:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 00:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.070909997529437,
+        "it_power_kw": 2292.499972226262,
+        "cooling_kw": 14.56999933719635,
+        "hvac_kw": 100.92399913630878,
+        "pump_kw": 45.36299847625196,
+        "plug_and_light_kw": 1.7041704170417071
+      }
+    },
+    {
+      "timestamp": "2025-08-27T07:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0709297184120883,
+        "it_power_kw": 2295.311504025817,
+        "cooling_kw": 11.929999351501465,
+        "hvac_kw": 100.88235318993291,
+        "pump_kw": 45.51699846237898,
+        "plug_and_light_kw": 4.47644764476447
+      }
+    },
+    {
+      "timestamp": "2025-08-27T08:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 02:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0713147626491637,
+        "it_power_kw": 2265.725732667089,
+        "cooling_kw": 12.649999380111694,
+        "hvac_kw": 101.05952478164222,
+        "pump_kw": 46.165998274460435,
+        "plug_and_light_kw": 1.7041704170417071
+      }
+    },
+    {
+      "timestamp": "2025-08-27T09:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 03:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0694039734487903,
+        "it_power_kw": 2261.1824435902836,
+        "cooling_kw": 13.06999945640564,
+        "hvac_kw": 95.91788013174528,
+        "pump_kw": 46.26699867285788,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T10:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 04:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.068801423982494,
+        "it_power_kw": 2279.859336949229,
+        "cooling_kw": 13.169999480247498,
+        "hvac_kw": 95.46540442481606,
+        "pump_kw": 46.56599934026599,
+        "plug_and_light_kw": 1.6561656165616587
+      }
+    },
+    {
+      "timestamp": "2025-08-27T11:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 05:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0669934757449706,
+        "it_power_kw": 2371.254392633319,
+        "cooling_kw": 14.649999618530273,
+        "hvac_kw": 95.7864097302496,
+        "pump_kw": 46.76599867269397,
+        "plug_and_light_kw": 1.6561656165616587
+      }
+    },
+    {
+      "timestamp": "2025-08-27T12:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 06:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0667993935632496,
+        "it_power_kw": 2415.9505920912625,
+        "cooling_kw": 17.219998836517334,
+        "hvac_kw": 95.87286607859998,
+        "pump_kw": 46.574997898191214,
+        "plug_and_light_kw": 1.7161716171617154
+      }
+    },
+    {
+      "timestamp": "2025-08-27T13:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 07:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0688541931338078,
+        "it_power_kw": 2373.162461486697,
+        "cooling_kw": 18.339999198913574,
+        "hvac_kw": 96.11402059844745,
+        "pump_kw": 47.26799864694476,
+        "plug_and_light_kw": 1.6801680168016757
+      }
+    },
+    {
+      "timestamp": "2025-08-27T14:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 08:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.069705678799364,
+        "it_power_kw": 2412.7280277758837,
+        "cooling_kw": 21.41999864578247,
+        "hvac_kw": 95.49439757088727,
+        "pump_kw": 46.76599867269397,
+        "plug_and_light_kw": 4.500450045004501
+      }
+    },
+    {
+      "timestamp": "2025-08-27T15:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 09:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0718462664677408,
+        "it_power_kw": 2443.340521302104,
+        "cooling_kw": 27.489999294281006,
+        "hvac_kw": 96.14743186745582,
+        "pump_kw": 47.26299855671823,
+        "plug_and_light_kw": 4.644464446444646
+      }
+    },
+    {
+      "timestamp": "2025-08-27T16:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 10:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0761747345702743,
+        "it_power_kw": 2425.4282814983726,
+        "cooling_kw": 36.32999801635742,
+        "hvac_kw": 95.89689319570961,
+        "pump_kw": 47.860997503623366,
+        "plug_and_light_kw": 4.6684668466846775
+      }
+    },
+    {
+      "timestamp": "2025-08-27T17:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 11:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0783583540202024,
+        "it_power_kw": 2445.6991969593764,
+        "cooling_kw": 44.16999864578247,
+        "hvac_kw": 96.14149886816709,
+        "pump_kw": 46.66099914163351,
+        "plug_and_light_kw": 4.6684668466846775
+      }
+    },
+    {
+      "timestamp": "2025-08-27T18:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 12:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0806416415657358,
+        "it_power_kw": 2488.4476018401383,
+        "cooling_kw": 53.139997482299805,
+        "hvac_kw": 95.35004128691409,
+        "pump_kw": 47.56199874728918,
+        "plug_and_light_kw": 4.620462046204629
+      }
+    },
+    {
+      "timestamp": "2025-08-27T19:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 13:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0832404763748484,
+        "it_power_kw": 2518.6118358038666,
+        "cooling_kw": 60.70999813079834,
+        "hvac_kw": 96.05899074605078,
+        "pump_kw": 48.26099809259176,
+        "plug_and_light_kw": 4.620462046204629
+      }
+    },
+    {
+      "timestamp": "2025-08-27T20:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 14:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0841781546264142,
+        "it_power_kw": 2480.588312276006,
+        "cooling_kw": 61.68999767303467,
+        "hvac_kw": 95.50388824004825,
+        "pump_kw": 46.99699855595827,
+        "plug_and_light_kw": 4.620462046204629
+      }
+    },
+    {
+      "timestamp": "2025-08-27T21:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.082604488729631,
+        "it_power_kw": 2500.6522608567475,
+        "cooling_kw": 60.669997692108154,
+        "hvac_kw": 95.73190531437066,
+        "pump_kw": 48.15899807214737,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-27T22:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 16:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.082400342805388,
+        "it_power_kw": 2483.2146322728395,
+        "cooling_kw": 60.339998722076416,
+        "hvac_kw": 95.4135388527463,
+        "pump_kw": 46.85999896377325,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-27T23:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 17:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0841517373622966,
+        "it_power_kw": 2420.742832092166,
+        "cooling_kw": 60.16999816894531,
+        "hvac_kw": 94.87451872777271,
+        "pump_kw": 46.660997711122036,
+        "plug_and_light_kw": 2.004200420042005
+      }
+    },
+    {
+      "timestamp": "2025-08-28T00:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 18:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0855091722716943,
+        "it_power_kw": 2391.329641692996,
+        "cooling_kw": 60.72999811172485,
+        "hvac_kw": 94.65842225459008,
+        "pump_kw": 47.08799750357866,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-28T01:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 19:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0838045389406843,
+        "it_power_kw": 2431.7902531636955,
+        "cooling_kw": 60.29999828338623,
+        "hvac_kw": 95.18686647997701,
+        "pump_kw": 46.32799818366766,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-28T02:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 20:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0739733612861122,
+        "it_power_kw": 2431.702905260205,
+        "cooling_kw": 38.37999773025513,
+        "hvac_kw": 94.524040737222,
+        "pump_kw": 44.97299866378307,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-28T03:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 21:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0640495978351194,
+        "it_power_kw": 2582.931246868253,
+        "cooling_kw": 23.239999294281006,
+        "hvac_kw": 94.66651459225325,
+        "pump_kw": 45.572998091578484,
+        "plug_and_light_kw": 1.9561956195619712
+      }
+    },
+    {
+      "timestamp": "2025-08-28T04:59:07+00:00",
+      "source_timestamp": "Wed Aug 27 2025 22:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0633563376304072,
+        "it_power_kw": 2568.631449011922,
+        "cooling_kw": 19.519999265670776,
+        "hvac_kw": 95.41888632578764,
+        "pump_kw": 45.81999772042036,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-28T05:59:08+00:00",
+      "source_timestamp": "Wed Aug 27 2025 23:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.06539254233369,
+        "it_power_kw": 2522.676026558757,
+        "cooling_kw": 20.369999170303345,
+        "hvac_kw": 95.79799822339875,
+        "pump_kw": 46.76799864694476,
+        "plug_and_light_kw": 2.0282028202820364
+      }
+    },
+    {
+      "timestamp": "2025-08-28T06:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 00:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.067371605297072,
+        "it_power_kw": 2520.439493745923,
+        "cooling_kw": 26.50999903678894,
+        "hvac_kw": 93.97986115748078,
+        "pump_kw": 47.35999893397093,
+        "plug_and_light_kw": 1.9561956195619712
+      }
+    },
+    {
+      "timestamp": "2025-08-28T07:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 01:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.070713705533548,
+        "it_power_kw": 2509.7580972300766,
+        "cooling_kw": 34.17999863624573,
+        "hvac_kw": 95.83509670266123,
+        "pump_kw": 45.442998088896275,
+        "plug_and_light_kw": 2.016201620162028
+      }
+    },
+    {
+      "timestamp": "2025-08-28T08:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 02:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0686160911622178,
+        "it_power_kw": 2491.5395011321307,
+        "cooling_kw": 28.079999208450317,
+        "hvac_kw": 95.82850687637148,
+        "pump_kw": 45.070997439324856,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-28T09:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 03:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0660663979777258,
+        "it_power_kw": 2520.6856049343346,
+        "cooling_kw": 23.339998960494995,
+        "hvac_kw": 95.6074203051949,
+        "pump_kw": 45.58099866658449,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-28T10:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 04:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0622233370294416,
+        "it_power_kw": 2605.8755303190947,
+        "cooling_kw": 17.809998989105225,
+        "hvac_kw": 96.06607427027969,
+        "pump_kw": 46.2659977003932,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-28T11:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 05:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.057628853787028,
+        "it_power_kw": 2606.7441881912946,
+        "cooling_kw": 8.329999685287476,
+        "hvac_kw": 95.31648196139048,
+        "pump_kw": 44.572997614741325,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-28T12:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 06:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0607079233788104,
+        "it_power_kw": 2564.355192706227,
+        "cooling_kw": 11.019999384880066,
+        "hvac_kw": 95.19745166871198,
+        "pump_kw": 47.16699827834964,
+        "plug_and_light_kw": 2.2922292229223094
+      }
+    },
+    {
+      "timestamp": "2025-08-28T13:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 07:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.064611033264178,
+        "it_power_kw": 2511.5976218374967,
+        "cooling_kw": 14.619999289512634,
+        "hvac_kw": 95.67445769386885,
+        "pump_kw": 47.361998461186886,
+        "plug_and_light_kw": 4.620462046204629
+      }
+    },
+    {
+      "timestamp": "2025-08-28T14:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 08:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0698993343188423,
+        "it_power_kw": 2469.218490318179,
+        "cooling_kw": 26.81999921798706,
+        "hvac_kw": 95.46953322982831,
+        "pump_kw": 48.32699829339981,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-28T15:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 09:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0775305472742822,
+        "it_power_kw": 2467.4579937137364,
+        "cooling_kw": 41.279998779296875,
+        "hvac_kw": 95.99690510866014,
+        "pump_kw": 49.35799789428711,
+        "plug_and_light_kw": 4.6684668466846775
+      }
+    },
+    {
+      "timestamp": "2025-08-28T16:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 10:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.083488036571938,
+        "it_power_kw": 2429.358498514831,
+        "cooling_kw": 54.09999895095825,
+        "hvac_kw": 95.47190526891931,
+        "pump_kw": 48.557997703552246,
+        "plug_and_light_kw": 4.692469246924709
+      }
+    },
+    {
+      "timestamp": "2025-08-28T17:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 11:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0874533150633483,
+        "it_power_kw": 2401.5257233041525,
+        "cooling_kw": 62.0699987411499,
+        "hvac_kw": 95.36088632780356,
+        "pump_kw": 47.561997793614864,
+        "plug_and_light_kw": 5.028502850285032
+      }
+    },
+    {
+      "timestamp": "2025-08-28T18:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 12:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0888942259145362,
+        "it_power_kw": 2343.8062813655138,
+        "cooling_kw": 61.45999813079834,
+        "hvac_kw": 95.91238671375211,
+        "pump_kw": 46.35799818485975,
+        "plug_and_light_kw": 4.620462046204629
+      }
+    },
+    {
+      "timestamp": "2025-08-28T19:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 13:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.080865568528361,
+        "it_power_kw": 2333.9412942513227,
+        "cooling_kw": 45.00999879837036,
+        "hvac_kw": 95.44999434885703,
+        "pump_kw": 43.29499847441912,
+        "plug_and_light_kw": 4.980498049804999
+      }
+    },
+    {
+      "timestamp": "2025-08-28T20:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 14:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0780268878093935,
+        "it_power_kw": 2312.9597641195655,
+        "cooling_kw": 36.08999824523926,
+        "hvac_kw": 95.44656186475761,
+        "pump_kw": 44.003998663276434,
+        "plug_and_light_kw": 4.932493249324951
+      }
+    },
+    {
+      "timestamp": "2025-08-28T21:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 15:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0784402206653472,
+        "it_power_kw": 2228.5747301909328,
+        "cooling_kw": 29.439998626708984,
+        "hvac_kw": 95.59043186052929,
+        "pump_kw": 45.13499867171049,
+        "plug_and_light_kw": 4.644464446444661
+      }
+    },
+    {
+      "timestamp": "2025-08-28T22:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 16:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0779642624865218,
+        "it_power_kw": 2221.3710003014803,
+        "cooling_kw": 30.189999103546143,
+        "hvac_kw": 95.42635337331001,
+        "pump_kw": 45.56699885055423,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-28T23:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 17:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0797033418464141,
+        "it_power_kw": 2257.248177673042,
+        "cooling_kw": 35.10999870300293,
+        "hvac_kw": 96.15902774966865,
+        "pump_kw": 46.66099866479635,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-29T00:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 18:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0807260271153656,
+        "it_power_kw": 2220.338259851575,
+        "cooling_kw": 36.219998359680176,
+        "hvac_kw": 96.07989047388979,
+        "pump_kw": 44.93499731644988,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-29T01:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 19:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.079467331348128,
+        "it_power_kw": 2265.5232808362243,
+        "cooling_kw": 36.67999792098999,
+        "hvac_kw": 95.58389223425903,
+        "pump_kw": 45.766998659819365,
+        "plug_and_light_kw": 2.00420042004202
+      }
+    },
+    {
+      "timestamp": "2025-08-29T02:59:07+00:00",
+      "source_timestamp": "Thu Aug 28 2025 20:59:07 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0773620504582313,
+        "it_power_kw": 2213.5546838184596,
+        "cooling_kw": 28.399998664855957,
+        "hvac_kw": 95.69693379287875,
+        "pump_kw": 45.1679986640811,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    },
+    {
+      "timestamp": "2025-08-29T03:59:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 21:59:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.0749127387352548,
+        "it_power_kw": 2196.337173208356,
+        "cooling_kw": 21.289998531341553,
+        "hvac_kw": 95.88043347718644,
+        "pump_kw": 45.334998002275825,
+        "plug_and_light_kw": 2.0282028202820364
+      }
+    },
+    {
+      "timestamp": "2025-08-29T04:35:08+00:00",
+      "source_timestamp": "Thu Aug 28 2025 22:35:08 GMT-0600 (Mountain Daylight Time)",
+      "metrics": {
+        "pue": 1.074413627331888,
+        "it_power_kw": 2163.753217351079,
+        "cooling_kw": 18.07999897003174,
+        "hvac_kw": 95.57553008761906,
+        "pump_kw": 45.37699847668409,
+        "plug_and_light_kw": 1.9801980198019882
+      }
+    }
+  ]
+}

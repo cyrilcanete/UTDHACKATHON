@@ -14,7 +14,7 @@ function clearPrivate() {
   for (const id of ['greeting','left-page','right-page','weather','readings','left-title','right-title']) $(id).textContent = '';
   cache.clear();
 }
-function card(title, text) { return {title, text: String(text || 'No information available.')}; }
+function card(title, text, highlights=[]) { return {title, text: String(text || 'No information available.'), highlights}; }
 // Divide by actual rendered height, keeping every word. Never line-clamp or ellipsize.
 function pagesFor(cards, element) {
   const key = element.id + JSON.stringify(cards);
@@ -26,7 +26,7 @@ function pagesFor(cards, element) {
     for (const word of words) {
       element.textContent = text + word;
       if (text && element.scrollHeight > element.clientHeight) {
-        pages.push(card(c.title, text.trimEnd())); text = word;
+        pages.push(card(c.title, text.trimEnd(), c.highlights)); text = word;
       } else text += word;
       element.textContent = text;
       while (element.scrollHeight > element.clientHeight) {
@@ -36,11 +36,11 @@ function pagesFor(cards, element) {
           element.textContent = text.slice(0, mid);
           if (element.scrollHeight <= element.clientHeight) low = mid; else high = mid - 1;
         }
-        pages.push(card(c.title, text.slice(0, low)));
+        pages.push(card(c.title, text.slice(0, low), c.highlights));
         text = text.slice(low); element.textContent = text;
       }
     }
-    if (text) pages.push(card(c.title, text.trimEnd()));
+    if (text) pages.push(card(c.title, text.trimEnd(), c.highlights));
   }
   if (cache.size > 8) cache.clear();
   cache.set(key, pages); return pages;
@@ -49,6 +49,16 @@ function showPages(side, cards) {
   const element = $(side + '-page'), pages = pagesFor(cards, element);
   const index = Math.floor((Date.now() - sessionStart) / 14000) % pages.length;
   element.textContent = pages[index].text;
+  const terms = (pages[index].highlights || []).filter(x => x && x.length > 2);
+  if (terms.length) {
+    const pattern = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')','gi');
+    const text=pages[index].text; const fragment=document.createDocumentFragment(); let end=0;
+    for (const match of text.matchAll(pattern)) {
+      fragment.append(document.createTextNode(text.slice(end,match.index)));
+      const mark=document.createElement('mark'); mark.textContent=match[0]; fragment.append(mark); end=match.index+match[0].length;
+    }
+    fragment.append(document.createTextNode(text.slice(end))); element.replaceChildren(fragment);
+  }
   $(side + '-title').textContent = pages[index].title;
   $(side + '-count').textContent = `${index + 1} / ${pages.length} · advances automatically`;
 }
@@ -67,7 +77,7 @@ function render(data) {
   if (!m.demo_controls && $('demo').open) $('demo').close();
   if (m.mode === 'welcome' || !m.screen_awake) { clearPrivate(); return; }
   $('welcome').hidden = true; $('dashboard').hidden = false;
-  $('greeting').textContent = `Hello, ${data.settings.name}`;
+  $('greeting').textContent = m.mode === 'work' ? `${data.settings.name}'s work desk` : `Hello, ${data.settings.name}`;
   $('mode').textContent = `${m.mode} mode`;
   $('source').textContent = data.settings.demo ? 'DEMO account data' + (m.sensors.simulated ? ' · simulated sensors' : ' · live sensor input') : 'Your mirror · live connections';
   const s = m.sensors;
@@ -88,7 +98,14 @@ function render(data) {
     const inbox = data.inbox?.data;
     // Safety review first so the demo is visible immediately after scanning.
     for (const item of inbox?.reviews || []) {
-      right.push(card('Inbox · review before acting', `${item.subject}\nFrom: ${item.sender}\n\n${item.review.signals.map(x => `${x.matches?.length ? '“' + x.matches.join('”, “') + '” — ' : ''}${x.detail}`).join('\n\n')}\n\nNext step: ${item.review.next_step}\n\n${inbox.review_scope}\nRule-based review; not proof of fraud.`));
+      const phrases=item.review.signals.flatMap(x=>x.matches || []);
+      const excerpt=item.review.excerpt || '';
+      right.push(card('Message · pause before acting', `${excerpt.startsWith(item.subject) ? excerpt : item.subject+'\n\n'+excerpt}\n\nSafer action: ${item.review.next_step}`,phrases));
+      right.push(card('Why these phrases matter', `${item.review.signals.map(x => `“${(x.matches || []).join('”, “')}” — ${x.detail}`).join('\n\n')}\n\n${inbox.review_scope}\nPhrase matches are not proof of fraud.`,phrases));
+    }
+    if (data.personal_assistant?.ai) {
+      const ai=data.personal_assistant.ai;
+      right.push(card('Nemotron · personal review', `${ai.note}\n\n${ai.tools ? 'Completed '+ai.tools.length+' read-only tools.' : ai.method}\nGenerated ${ai.generated_at || 'this session'}`));
     }
     right.push(card('Your briefing', data.briefing?.error || data.briefing?.data?.summary || 'No briefing available.'));
     right.push(card('Inbox', data.inbox?.error || `${inbox?.unread ?? '—'} unread\n\n${(inbox?.messages || []).map(x => x.subject + '\n' + x.sender).join('\n\n') || 'No unread messages.'}\n\n${inbox?.review_scope || ''}`));
@@ -96,11 +113,31 @@ function render(data) {
   } else {
     $('weather').textContent = `Room status: ${m.work.status}`;
     const a = m.work.assistant;
-    left.push(card('Facility context', `${a.asset.name} · ${a.asset.id}\n\n${a.context}\n\n${a.possible_impact}`));
-    left.push(card('Related work orders',a.related_work_orders.length ? a.related_work_orders.map(o => `${o.id}: ${o.summary} (${o.status})`).join('\n\n') : 'No related work orders configured.'));
-    right.push(card('Operator handoff', `${m.work.handoff}\n\n${a.procedure.map((x,i) => `${i+1}. ${x}`).join('\n\n')}\n\n${a.incident ? a.incident.id + '\n' + a.incident.status : 'No new incident needed.'}\n${a.storage}`));
-    if (a.ai) right.push(card(a.ai.method, a.ai.note));
-    right.push(card('How this was assessed', `${a.trace.join('\n\n')}\n\n${a.method}\nThese readings do not identify a failed component.`));
+    const tc = a.technician;
+    const assigned = tc.assigned_orders[0];
+    $('source').textContent = tc.training ? 'TRAINING CASE · historical ESIF reference' : 'Local technician task · historical ESIF reference';
+    left.push(card(`${tc.technician} · assignment`, `${assigned ? assigned.id+' · '+assigned.status+'\n'+assigned.summary : 'Verify local environmental conditions'}\n\n${tc.asset.id} · ${tc.asset.name}`));
+    right.push(card('Technician · next action', `${tc.assessment}\n\nNext step: ${tc.next_step}\n\n${assigned ? 'Existing order '+assigned.id+': '+assigned.last_note : 'No assigned work order is connected.'}\n\n${tc.label}`));
+    right.push(card('Equipment & work history', `${tc.asset.name} · ${tc.asset.id}\n${tc.asset.sensor_link || ''}\n\n${tc.related_orders.map(o => o.id+' · '+o.status+'\n'+o.summary+'\n'+(o.last_note || '')).join('\n\n')}\n\n${tc.possible_impact}`));
+    right.push(card('Troubleshooting procedure', `${tc.procedure.map((x,i)=>(i+1)+'. '+x).join('\n\n')}\n\n${tc.procedure_status}`));
+    const dc = a.data_center;
+    const num = (v,d=1) => typeof v === 'number' ? v.toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d}) : 'Unavailable';
+    if (dc?.available) {
+      const at = dc.latest.timestamp.slice(0,19).replace('T',' ') + ' UTC';
+      const power = dc.latest.metrics;
+      $('source').textContent = `${tc.training ? 'TRAINING CASE · ' : ''}ESIF HISTORICAL\n${at}`;
+      left.push(card('ESIF · recorded power', `PUE ${num(power.pue,3)}\nIT equipment ${num(power.it_power_kw)} kW\nCooling ${num(power.cooling_kw)} kW\nHVAC ${num(power.hvac_kw)} kW\nPumps ${num(power.pump_kw)} kW\n\nRecorded ${at}`));
+      left.push(card('Source & coverage', `${dc.facility}\n\n${dc.record_count} hourly observations\n${dc.period_start.slice(0,10)} to ${dc.period_end.slice(0,10)}\n\nReal historical data · not live\nDOI ${dc.doi}`));
+      if (a.ai) right.push(card(a.ai.method, `${a.ai.note}\n\n${a.ai.tools ? 'Completed '+a.ai.tools.length+' read-only tools.\n' : ''}Generated ${a.ai.generated_at || 'during this session'}. Local sensor context may have changed since generation.`));
+      const pue = dc.statistics.pue;
+      right.push(card('Data-center evidence', `Latest recorded PUE: ${num(power.pue,3)}\nPUE range across ${pue.count} recent hourly samples: ${num(pue.min,3)}–${num(pue.max,3)}\n\n${dc.missing_latest.length ? 'Missing latest fields: '+dc.missing_latest.join(', ') : 'All displayed power fields are present.'}\n\n${dc.questionable_latest.length ? 'Check questionable values: '+dc.questionable_latest.join(', ')+'. ' : ''}These values alone do not establish an equipment failure.\n\n${a.ai_status}`));
+      right.push(card('Data provenance', `${dc.attribution}\n\n${dc.source_url}\n\n${dc.note}\n\n${dc.maintenance_status}`));
+    } else {
+      left.push(card('Data center unavailable', dc?.error || 'Real dataset unavailable.'));
+      right.push(card('Source connection', 'No measurements will be invented. Restore the ESIF data file and restart the app.'));
+    }
+    right.push(card('Local mirror room · DHT11', `${m.work.handoff}\n\n${a.procedure.map((x,i) => `${i+1}. ${x}`).join('\n\n')}\n\n${a.incident ? a.incident.id + '\n' + a.incident.status : 'No local incident needed.'}\n${a.storage}\n\nThese local readings are separate from ESIF.`));
+
   }
   showPages('left',left); showPages('right',right);
 }
@@ -137,7 +174,7 @@ addEventListener('keydown', e => {
   if (!state?.mirror.demo_controls) return;
   if (['arrowleft','arrowright','1','2','h','n','o','b','i'].includes(key)) { e.preventDefault(); if ($('demo').open) $('demo').close(); }
   if (key === '1' || key === '2') { const p = state.mirror.profiles[Number(key)-1]; if(p) refresh('/api/demo/scan',{profile_id:p.id}); }
-  if (key === 'arrowright' || key === 'arrowleft') refresh('/api/mode',{mode:key === 'arrowright' ? 'work' : 'personal'});
+  if (key === 'arrowright' || key === 'arrowleft') refresh('/api/mode',{mode:key === 'arrowright' ? 'personal' : 'work'});
   const scenarios = {h:'hot',n:'normal',o:'offline',b:'near',i:'away'};
   if (scenarios[key]) refresh('/api/demo/scenario',{scenario:scenarios[key]});
 });

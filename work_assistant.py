@@ -6,6 +6,8 @@ import json
 import threading
 import time
 from nemotron_agent import run
+from data_center import DataCenter
+from technician import context as technician_context
 from datetime import datetime, timezone
 
 
@@ -14,7 +16,8 @@ class WorkAssistant:
         self.cfg, self.path, self.write = cfg, path, write
         self.lock = threading.RLock()
         self.records = []
-        self.ai_result = None
+        self.data_center = DataCenter()
+        self.ai_result = {}
         self.ai_key = None
         self.storage_error = False
         if not cfg['demo'] and path.exists():
@@ -37,7 +40,7 @@ class WorkAssistant:
                 'Contact the responsible operator if the reading remains outside limits.'
             ])
             affected = asset.get('depends_on', [])
-            context = 'Configured asset record' if configured else 'Example asset context; replace with your facility information'
+            context = 'Configured local asset record' if configured else 'Local mirror room measured by your DHT11; separate from ESIF data'
             key = str(asset['id']) + ':' + ('environment' if work['status'] == 'attention' else 'sensor-data')
             incident = next((r for r in reversed(self.records) if r.get('key') == key and r['status'] == 'open'), None)
             changed = False
@@ -63,7 +66,7 @@ class WorkAssistant:
                     self.storage_error = True
             if self.storage_error:
                 storage = 'Journal save failed; incident is in memory only'
-            return {'ai': copy.deepcopy(self.ai_result) if self.ai_key == self.evidence_key(snapshot) else None, 'method': 'Local rules · not an AI diagnosis', 'asset': asset, 'context': context,
+            return {'technician': technician_context(self.cfg, snapshot), 'data_center': self.data_center.snapshot(), 'ai_status': self.ai_status(snapshot['active_profile']), 'ai': copy.deepcopy(self.ai_result.get(snapshot['active_profile'])), 'method': 'Local rules · not an AI diagnosis', 'asset': asset, 'context': context,
                     'related_work_orders': [o for o in orders if o.get('asset_id') == asset['id']],
                     'possible_impact': ('Check dependency: ' + ', '.join(affected)) if affected else 'No downstream dependencies configured; impact is unconfirmed.',
                     'procedure': procedures if work['status'] != 'normal' else ['Readings are within configured limits. Continue monitoring.'],
@@ -77,20 +80,31 @@ class WorkAssistant:
 
     def worker(self, runtime, stop):
         options = self.cfg.get('nemotron', {})
-        if self.cfg['demo'] or not options.get('enabled'):
+        if (self.cfg['demo'] and not options.get('allow_demo', False)) or not options.get('enabled'):
             return
-        last_key, due = None, 0
+        last_key, due = {}, {}
         while not stop.is_set():
             snapshot = runtime.snapshot()
+            pid=snapshot['active_profile']
             key = self.evidence_key(snapshot)
-            if snapshot['mode'] == 'work' and key != last_key and time.monotonic() >= due:
-                due = time.monotonic() + 300  # Bound optional remote usage.
+            if snapshot['mode'] == 'work' and key != last_key.get(pid) and time.monotonic() >= due.get(pid,0):
+                due[pid] = time.monotonic() + 300  # Bound optional remote usage.
                 assessment = self.assess(snapshot)
                 try:
                     result = run(options, snapshot, assessment)
                 except Exception:
                     result = {'method': 'Nemotron unavailable', 'note': 'Showing local rules. Check the configured endpoint, model and API key.'}
                 with self.lock:
-                    self.ai_key, self.ai_result = key, result
-                last_key = key
+                    result['generated_at'] = datetime.now(timezone.utc).isoformat()
+                    self.ai_key = key
+                    self.ai_result[pid] = result
+                last_key[pid] = key if 'tools' in result else None
             stop.wait(2)
+
+    def ai_status(self, pid=None):
+        options=self.cfg.get('nemotron', {})
+        if not options.get('enabled') or (self.cfg['demo'] and not options.get('allow_demo',False)):
+            return 'Nemotron setup required'
+        if pid not in self.ai_result:
+            return 'Nemotron ready / analyzing in background'
+        return self.ai_result[pid].get('method','Nemotron status unavailable')

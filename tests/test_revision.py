@@ -27,8 +27,8 @@ class RevisionTests(unittest.TestCase):
             self.assertEqual(state['settings']['tasks'], [])
         app.RUNTIME.scan('F0E2E55C')
         self.assertEqual(app.public_state(self.cfg)['settings']['name'], 'Cyril')
-        for event, mode in [({'delta':-1}, 'work'), ({'delta':1}, 'personal'),
-                            ({'direction':'right'}, 'work'), ({'direction':'left'}, 'personal'),
+        for event, mode in [({'delta':10}, 'work'), ({'delta':-10}, 'personal'),
+                            ({'delta':10}, 'work'), ({'delta':-10}, 'personal'),
                             ({'action':'press'}, 'welcome')]:
             app.RUNTIME.ingest(dict(event, type='encoder'))
             self.assertEqual(app.RUNTIME.snapshot()['mode'], mode)
@@ -77,7 +77,7 @@ class RevisionTests(unittest.TestCase):
             path=Path(folder)/'scans.ndjson'; reader=ScanReader(runtime,path); publisher=ScanPublisher(path)
             publisher.publish_event({'type':'sensors','temperature_c':26,'humidity_pct':42,'motion':True})
             publisher.publish('F0E2E55C',4)
-            publisher.publish_event({'type':'encoder','delta':-1})
+            publisher.publish_event({'type':'encoder','delta':10})
             reader.poll()
             self.assertEqual(runtime.snapshot()['mode'],'work')
             self.assertEqual(runtime.snapshot()['sensors']['temperature_c'],26)
@@ -104,7 +104,7 @@ class RevisionTests(unittest.TestCase):
         transport=Mock(side_effect=replies)
         result=run({'enabled':True},snap,assessment,transport)
         self.assertEqual(result['tools'],sorted(NAMES))
-        self.assertEqual(sum(m['role']=='tool' for m in transport.call_args.args[1]),4)
+        self.assertEqual(sum(m['role']=='tool' for m in transport.call_args.args[1]),len(NAMES))
         for reply in ({'content':'Unverified answer'}, {'tool_calls':[{'id':'bad','function':{'name':'send_email','arguments':'{}'}}]}):
             with self.assertRaises(ValueError):
                 run({'enabled':True},snap,assessment,Mock(return_value=reply))

@@ -59,7 +59,13 @@
   },
   "nemotron": {
     "enabled": false,
-    "endpoint": "",
-    "model": ""
+    "allow_demo": false,
+    "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "model": "nvidia/nemotron-3-nano-30b-a3b",
+    "personal_enabled": false
+  },
+  "encoder": {
+    "detents_per_revolution": 20,
+    "right_delta": -1
   }
 }

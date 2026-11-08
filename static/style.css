@@ -3,3 +3,5 @@
 
 #stage{filter:brightness(1);transition:filter 900ms ease}
 @media(prefers-reduced-motion:reduce){#stage{transition:none}}
+
+mark{background:transparent;color:#ffdca0;text-decoration:underline;text-underline-offset:4px}
