@@ -19,6 +19,7 @@ from message_review import SAMPLES, review_message, PHISHING_QUERY, review_inbox
 from work_assistant import WorkAssistant
 from personal_assistant import PersonalAssistant
 from rfid_bridge import rfid_worker
+from nemotron_agent import NemotronError, describe_error
 
 BASE = Path(__file__).resolve().parent
 PRIVATE = BASE / "private"
@@ -226,6 +227,30 @@ def initialize(cfg):
         effective = profile_config(cfg, profile["id"])
         PROFILE_STATES[profile["id"]] = initial_personal_state(effective)
     STATE = PROFILE_STATES[RUNTIME.profiles[0]["id"]]
+    # All transports feed MirrorRuntime.ingest; the callback only queues work.
+    RUNTIME.on_analyze = lambda: encoder_analysis(cfg)
+
+def request_nemotron(cfg):
+    """Capture the selected profile and queue its workflow without doing inference."""
+    with RUNTIME.lock:
+        snapshot = RUNTIME.snapshot()
+        pid = snapshot['active_profile']
+        if not pid or snapshot['mode'] not in ('personal', 'work'):
+            raise NemotronError('no_profile', 'Scan a card and choose a mode before requesting analysis.')
+        if snapshot['mode'] == 'work':
+            return WORK.request_run(snapshot)
+        inbox_state = personal_snapshot(profile_config(cfg, pid), pid).get('inbox', {})
+        return PERSONAL.request_run(pid, inbox_state)
+
+def encoder_analysis(cfg):
+    """Expected AI unavailability is feedback, not an invalid hardware event."""
+    try:
+        queued = request_nemotron(cfg)
+        message = 'Analysis queued for this mode.' if queued else 'Analysis is already queued or running.'
+        RUNTIME.report_analysis(message, 'queued' if queued else 'busy')
+    except NemotronError as error:
+        failure = describe_error(error)
+        RUNTIME.report_analysis(failure['message'], failure['code'])
 
 def initial_personal_state(cfg):
     state = {}
@@ -266,7 +291,7 @@ def public_state(cfg):
         runtime["work"]["assistant"] = WORK.assess(runtime)
     if runtime["mode"] == "personal":
         result["personal_assistant"] = PERSONAL.snapshot(profile_id, result.get("inbox", {}))
-    result["build"] = "mirror-content-v8"
+    result["build"] = "mirror-nemotron-v10"
     result["mirror"] = runtime
     result["message_samples"] = SAMPLES if runtime["mode"] == "personal" else []
     return result
@@ -343,7 +368,7 @@ def handler_for(cfg, port=5000):
             if not self.trusted_request():
                 self.reply({"error": "Local same-origin requests only"}, 403)
                 return
-            routes = ("/api/mode", "/api/demo/scan", "/api/demo/scenario", "/api/hardware", "/api/message-review", "/api/wake", "/api/welcome")
+            routes = ("/api/mode", "/api/demo/scan", "/api/demo/scenario", "/api/hardware", "/api/message-review", "/api/wake", "/api/welcome", "/api/nemotron/run")
             if self.path not in routes:
                 self.reply({"error": "Unknown route"}, 404)
                 return
@@ -361,7 +386,13 @@ def handler_for(cfg, port=5000):
                 if self.path.startswith("/api/demo/") and not cfg["demo"]:
                     self.reply({"error": "Demo controls are disabled"}, 403)
                     return
-                if self.path == "/api/welcome":
+                if self.path == "/api/nemotron/run":
+                    if payload:
+                        raise ValueError('Analysis uses the active profile and captured evidence; send an empty object.')
+                    request_nemotron(cfg)
+                    self.reply(public_state(cfg),202)
+                    return
+                elif self.path == "/api/welcome":
                     RUNTIME.set_mode("welcome")
                 elif self.path == "/api/mode":
                     RUNTIME.set_mode(payload.get("mode"))
@@ -395,6 +426,10 @@ def handler_for(cfg, port=5000):
                     self.reply(result)
                     return
                 self.reply(public_state(cfg))
+            except NemotronError as error:
+                failure=describe_error(error)
+                status=429 if failure['code']=='cooldown' else 403 if failure['code']=='disabled' else 409
+                self.reply({'error':failure['message'],'code':failure['code']},status)
             except (ValueError, UnicodeError, TypeError):
                 self.reply({"error": "Invalid request. Check the field names, types and allowed values."}, 400)
 
