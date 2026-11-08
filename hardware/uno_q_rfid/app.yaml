@@ -1,0 +1,5 @@
+name: RFID_Mirror
+icon: "📇"
+description: RC522 scans for the Smart Mirror dashboard on UNO Q.
+ports: []
+bricks: []

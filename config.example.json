@@ -6,7 +6,10 @@
   "latitude": 32.9483,
   "longitude": -96.7299,
   "calendar_id": "primary",
-  "tasks": ["Choose today's most important task", "Check your next event"],
+  "tasks": [
+    "Choose today's most important task",
+    "Check your next event"
+  ],
   "ai_enabled": false,
   "ollama_url": "http://127.0.0.1:11434",
   "ollama_model": "qwen2.5:3b",
@@ -16,16 +19,30 @@
     {
       "id": "cyril",
       "name": "Cyril",
-      "rfid_uids": [],
-      "tasks": ["Prepare the software demo", "Review today's schedule"]
+      "rfid_uids": [
+        "F0 E2 E5 5C"
+      ],
+      "tasks": [
+        "Prepare the software demo",
+        "Review today's schedule"
+      ]
     },
     {
       "id": "partner",
-      "name": "Partner",
-      "rfid_uids": [],
-      "tasks": ["Test the RFID reader", "Check the project checklist"]
+      "name": "Sarah",
+      "rfid_uids": [
+        "87 4B BA 62"
+      ],
+      "tasks": [
+        "Test the RFID reader",
+        "Check the project checklist"
+      ]
     }
   ],
+  "rfid": {
+    "source": "none",
+    "event_path": ""
+  },
   "sensors": {
     "source": "demo",
     "port": "",
@@ -35,6 +52,14 @@
     "humidity_min_pct": 30,
     "humidity_max_pct": 60,
     "motion_sleep": false,
-    "idle_seconds": 120
+    "idle_seconds": 120,
+    "motion_dimming": true,
+    "dim_after_seconds": 60,
+    "dim_brightness": 0.2
+  },
+  "nemotron": {
+    "enabled": false,
+    "endpoint": "",
+    "model": ""
   }
 }

@@ -1,181 +1,145 @@
 'use strict';
-let dashboard = null;
-let privacyHidden = sessionStorage.getItem('mirror-private') === 'true';
-let requestVersion = 0;
-let actionBusy = false;
-let pollBusy = false;
-let reviewVersion = 0;
-let identity = '';
-let profileSignature = '';
-let sampleSignature = '';
-const el = id => document.getElementById(id);
-function write(id, value) { el(id).textContent = value ?? ''; }
-function list(id, items, render) {
-  const target = el(id); target.replaceChildren();
-  for (const item of items) { const row = document.createElement('li'); render(row, item); target.append(row); }
+const $ = id => document.getElementById(id);
+let state = null, sequence = 0, profilesKey = '', lastSession = '', sessionStart = Date.now();
+const cache = new Map();
+function fitScreen() {
+  const scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $('stage').style.transform = `scale(${scale})`;
+  $('stage').style.left = `${(innerWidth - 1920 * scale) / 2}px`;
+  $('stage').style.top = `${(innerHeight - 1080 * scale) / 2}px`;
 }
-function secondary(row, text) { const detail = document.createElement('small'); detail.textContent = text; row.append(detail); }
-function zone() { return dashboard?.settings.timezone || 'America/Chicago'; }
-function formatTime(value) { return new Date(value).toLocaleTimeString('en-US', {timeZone:zone(), hour:'numeric', minute:'2-digit'}); }
-function eventTime(e) {
-  if (e.all_day) return `${e.start} · All day`;
-  return new Date(e.start).toLocaleDateString('en-US', {timeZone:zone(),weekday:'short',month:'short',day:'numeric'}) + ' · ' + formatTime(e.start);
+addEventListener('resize', fitScreen); fitScreen();
+function clearPrivate() {
+  $('dashboard').hidden = true; $('welcome').hidden = false;
+  for (const id of ['greeting','left-page','right-page','weather','readings','left-title','right-title']) $(id).textContent = '';
+  cache.clear();
 }
-function status(key) {
-  const part = dashboard[key];
-  write(`${key}-status`, `${part?.error || ''}${part?.updated ? ' Updated ' + formatTime(part.updated) : ' Waiting for data'}`);
+function card(title, text) { return {title, text: String(text || 'No information available.')}; }
+// Divide by actual rendered height, keeping every word. Never line-clamp or ellipsize.
+function pagesFor(cards, element) {
+  const key = element.id + JSON.stringify(cards);
+  if (cache.has(key)) return cache.get(key);
+  const pages = [];
+  for (const c of cards) {
+    const words = c.text.match(/\S+\s*/g) || ['No information available.'];
+    let text = '';
+    for (const word of words) {
+      element.textContent = text + word;
+      if (text && element.scrollHeight > element.clientHeight) {
+        pages.push(card(c.title, text.trimEnd())); text = word;
+      } else text += word;
+      element.textContent = text;
+      while (element.scrollHeight > element.clientHeight) {
+        let low = 1, high = text.length;
+        while (low < high) {
+          const mid = Math.ceil((low + high) / 2);
+          element.textContent = text.slice(0, mid);
+          if (element.scrollHeight <= element.clientHeight) low = mid; else high = mid - 1;
+        }
+        pages.push(card(c.title, text.slice(0, low)));
+        text = text.slice(low); element.textContent = text;
+      }
+    }
+    if (text) pages.push(card(c.title, text.trimEnd()));
+  }
+  if (cache.size > 8) cache.clear();
+  cache.set(key, pages); return pages;
+}
+function showPages(side, cards) {
+  const element = $(side + '-page'), pages = pagesFor(cards, element);
+  const index = Math.floor((Date.now() - sessionStart) / 14000) % pages.length;
+  element.textContent = pages[index].text;
+  $(side + '-title').textContent = pages[index].title;
+  $(side + '-count').textContent = `${index + 1} / ${pages.length} · advances automatically`;
 }
 function clock() {
-  const now = new Date();
-  write('time', now.toLocaleTimeString('en-US', {timeZone:zone(),hour:'numeric',minute:'2-digit'}));
-  write('date', now.toLocaleDateString('en-US', {timeZone:zone(),weekday:'long',month:'long',day:'numeric'}));
-  if (dashboard?.mirror.mode === 'work') { write('next','Conditions in your shared space.'); return; }
-  const events = dashboard?.calendar?.data || [];
-  const active = events.find(e => !e.all_day && new Date(e.start) <= now && new Date(e.end) > now);
-  const next = events.find(e => !e.all_day && new Date(e.start) > now);
-  write('next', active ? `Now · ${active.title}` : next ? `${next.title} · in ${Math.ceil((new Date(next.start)-now)/60000)} min` : 'No upcoming timed events');
+  if (!state) return;
+  const opts = {timeZone:state.settings.timezone};
+  $('time').textContent = new Date().toLocaleTimeString('en-US',{...opts,hour:'numeric',minute:'2-digit'});
+  $('date').textContent = new Date().toLocaleDateString('en-US',{...opts,weekday:'long',month:'short',day:'numeric'});
 }
-function privacy() {
-  document.body.classList.toggle('private', privacyHidden);
-  write('privacy', privacyHidden ? 'Show personal details' : 'Hide personal details');
-  el('privacy').setAttribute('aria-pressed', String(privacyHidden));
-  sessionStorage.setItem('mirror-private', String(privacyHidden));
-}
-function resetReview() {
-  reviewVersion++;
-  el('message-text').value = '';
-  el('review-result').hidden = true;
-  for (const id of ['review-method','review-verdict','review-summary','review-next','review-ai','review-progress']) write(id,'');
-  el('review-signals').replaceChildren();
-}
-function renderPersonal() {
-  const w = dashboard.weather?.data;
-  write('temperature', w ? `${Math.round(w.temperature)}°F` : '—');
-  write('conditions', w ? `${w.condition} · Feels like ${Math.round(w.feels_like)}°` : 'Weather not available yet');
-  write('forecast', w ? `High ${Math.round(w.high)}° / Low ${Math.round(w.low)}° · Rain ${w.rain ?? '—'}%` : '');
-  list('events', dashboard.calendar?.data?.slice(0,5)||[], (row,e) => { row.textContent=e.title; secondary(row,eventTime(e)+(e.location ? ' · '+e.location : '')); });
-  if (!el('events').children.length) list('events',['No upcoming events available.'], (row,text) => { row.textContent=text; });
-  list('tasks', dashboard.settings.tasks.slice(0,3), (row,t) => { row.textContent=t; });
-  const b = dashboard.briefing?.data;
-  write('summary', b?.summary || 'Briefing is not ready yet.');
-  const sources = new Map([...(dashboard.calendar?.data||[]).map(e=>[e.id,e.title]),...(dashboard.inbox?.data?.messages||[]).map(m=>[m.id,m.subject])]);
-  list('actions', b?.action_items||[], (row,a) => { row.textContent=a.text; secondary(row,'Source: '+a.source_ids.map(s=>sources.get(s)||s).join(' · ')); });
-  const inbox = dashboard.inbox?.data;
-  write('inbox-title', inbox ? `Inbox · ${inbox.unread} unread` : 'Inbox');
-  list('messages', inbox?.messages?.slice(0,3)||[], (row,m) => { row.textContent=m.subject; secondary(row,m.sender); });
-  for (const key of ['weather','calendar','inbox','briefing']) status(key);
-  const signature = JSON.stringify(dashboard.message_samples);
-  if (signature !== sampleSignature) {
-    sampleSignature = signature;
-    el('message-samples').replaceChildren();
-    for (const sample of dashboard.message_samples) {
-      const button = document.createElement('button'); button.type='button'; button.textContent=sample.title;
-      button.addEventListener('click', () => { el('message-text').value=sample.text; el('review-result').hidden=true; });
-      el('message-samples').append(button);
+function render(data) {
+  state = data;
+  const brightness = data.mirror.brightness;
+  $('stage').style.filter = `brightness(${typeof brightness === 'number' && Number.isFinite(brightness) ? Math.max(.05, Math.min(1, brightness)) : 1})`;
+  const m = data.mirror, session = `${m.active_profile}:${m.mode}`;
+  if (session !== lastSession) { clearPrivate(); sessionStart = Date.now(); lastSession = session; }
+  if (!m.demo_controls && $('demo').open) $('demo').close();
+  if (m.mode === 'welcome' || !m.screen_awake) { clearPrivate(); return; }
+  $('welcome').hidden = true; $('dashboard').hidden = false;
+  $('greeting').textContent = `Hello, ${data.settings.name}`;
+  $('mode').textContent = `${m.mode} mode`;
+  $('source').textContent = data.settings.demo ? 'DEMO account data' + (m.sensors.simulated ? ' · simulated sensors' : ' · live sensor input') : 'Your mirror · live connections';
+  const s = m.sensors;
+  $('readings').textContent = `${s.temperature_c == null ? '—' : s.temperature_c.toFixed(1) + '°C'}  ·  ${s.humidity_pct == null ? '—' : Math.round(s.humidity_pct) + '% RH'}`;
+  $('sensor-status').textContent = (s.error ? 'DHT11 connection unavailable' : '') || (s.temperature_c == null || s.humidity_pct == null ? 'DHT11 unavailable / stale' : s.simulated ? 'Simulated room conditions' : 'DHT11 · fresh room readings');
+  $('connection').textContent = 'Connected · ' + (m.rfid_status || 'Card reader ready');
+  clock();
+  let left = [], right = [];
+  if (m.mode === 'personal') {
+    const w = data.weather?.data;
+    $('weather').textContent = (data.weather?.error ? 'Outdoor weather unavailable' : '') || (w ? `${w.temperature}°F outdoors\n${w.condition}` : 'Outdoor weather unavailable');
+    const events = data.calendar?.data || [];
+    left.push(card('Your schedule', data.calendar?.error || (events.length ? events.map(e => {
+      const when = e.all_day ? e.start : new Date(e.start).toLocaleString('en-US',{timeZone:data.settings.timezone,weekday:'short',hour:'numeric',minute:'2-digit'});
+      return `${when}\n${e.title}${e.location ? '\n' + e.location : ''}`;
+    }).join('\n\n') : 'No upcoming events.')));
+    if (data.settings.tasks.length) left.push(card('Your priorities',data.settings.tasks.join('\n\n')));
+    const inbox = data.inbox?.data;
+    // Safety review first so the demo is visible immediately after scanning.
+    for (const item of inbox?.reviews || []) {
+      right.push(card('Inbox · review before acting', `${item.subject}\nFrom: ${item.sender}\n\n${item.review.signals.map(x => `${x.matches?.length ? '“' + x.matches.join('”, “') + '” — ' : ''}${x.detail}`).join('\n\n')}\n\nNext step: ${item.review.next_step}\n\n${inbox.review_scope}\nRule-based review; not proof of fraud.`));
     }
+    right.push(card('Your briefing', data.briefing?.error || data.briefing?.data?.summary || 'No briefing available.'));
+    right.push(card('Inbox', data.inbox?.error || `${inbox?.unread ?? '—'} unread\n\n${(inbox?.messages || []).map(x => x.subject + '\n' + x.sender).join('\n\n') || 'No unread messages.'}\n\n${inbox?.review_scope || ''}`));
+    if (!(inbox?.reviews || []).length && !data.inbox?.error) right.push(card('Inbox review', 'No matching warning patterns in the checked messages. This does not establish that messages are safe.'));
+  } else {
+    $('weather').textContent = `Room status: ${m.work.status}`;
+    const a = m.work.assistant;
+    left.push(card('Facility context', `${a.asset.name} · ${a.asset.id}\n\n${a.context}\n\n${a.possible_impact}`));
+    left.push(card('Related work orders',a.related_work_orders.length ? a.related_work_orders.map(o => `${o.id}: ${o.summary} (${o.status})`).join('\n\n') : 'No related work orders configured.'));
+    right.push(card('Operator handoff', `${m.work.handoff}\n\n${a.procedure.map((x,i) => `${i+1}. ${x}`).join('\n\n')}\n\n${a.incident ? a.incident.id + '\n' + a.incident.status : 'No new incident needed.'}\n${a.storage}`));
+    if (a.ai) right.push(card(a.ai.method, a.ai.note));
+    right.push(card('How this was assessed', `${a.trace.join('\n\n')}\n\n${a.method}\nThese readings do not identify a failed component.`));
   }
+  showPages('left',left); showPages('right',right);
 }
-function clearPersonal() {
-  for (const id of ['events','tasks','messages','actions','message-samples']) el(id).replaceChildren();
-  for (const id of ['summary','weather-status','calendar-status','inbox-status','briefing-status','conditions','forecast','temperature']) write(id,'');
-  write('inbox-title','Inbox'); sampleSignature='';
-}
-function renderWork() {
-  const {sensors:s, work:w} = dashboard.mirror;
-  const temp = s.temperature_c === null ? '—' : `${s.temperature_c.toFixed(1)}°C`;
-  write('room-temperature',temp); write('metric-temperature',temp);
-  write('metric-humidity', s.humidity_pct === null ? '—' : `${s.humidity_pct.toFixed(0)}%`);
-  write('metric-motion', s.motion === null ? 'Unavailable' : s.motion ? 'Detected' : 'Quiet');
-  write('room-source', s.simulated ? 'SIMULATED · room sensor demonstration' : `${s.source.toUpperCase()} · shared room readings`);
-  write('room-status', w.status==='normal' ? 'Within configured limits' : w.status==='attention' ? 'Attention needed' : 'Fresh readings needed');
-  el('room-status').className=w.status==='attention' ? 'warning' : 'muted';
-  write('temperature-limit', `Alert at ${w.limits.temperature_alert_c}°C or above`);
-  write('humidity-limit', `Configured range ${w.limits.humidity_min_pct}–${w.limits.humidity_max_pct}%`);
-  write('work-heading', w.status==='normal' ? 'Within configured limits' : w.status==='attention' ? 'Check these conditions' : 'Readings unavailable');
-  list('work-alerts', w.alerts, (row,a) => { row.textContent=a.text; row.className=a.level; secondary(row,a.action); });
-  if (!w.alerts.length) list('work-alerts',['No threshold alerts from the current readings.'], (row,t) => { row.textContent=t; });
-  write('sensor-updated', s.updated ? `Last readings ${formatTime(s.updated)}${s.simulated ? ' · simulation' : ''}` : 'No sensor readings received');
-  write('sensor-error',s.error || ''); write('handoff',w.handoff);
-  document.querySelectorAll('[data-scenario]').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.scenario===w.scenario)));
-}
-function render() {
-  const m = dashboard.mirror;
-  const nextIdentity = `${m.active_profile}:${m.mode}`;
-  if (identity !== nextIdentity) { resetReview(); identity=nextIdentity; }
-  document.body.dataset.view=m.mode;
-  write('greeting',`Hello, ${dashboard.settings.name}.`);
-  write('mode',dashboard.settings.demo ? 'DEMO · FICTIONAL ACCOUNT DATA' : 'LIVE ACCOUNT DATA');
-  write('location',dashboard.settings.location); write('notice',m.event);
-  el('personal-mode').setAttribute('aria-pressed',String(m.mode==='personal'));
-  el('work-mode').setAttribute('aria-pressed',String(m.mode==='work'));
-  el('personal-panels').hidden=m.mode!=='personal'; el('weather-panel').hidden=m.mode!=='personal';
-  el('work-panels').hidden=m.mode!=='work'; el('room-glance').hidden=m.mode!=='work';
-  el('privacy').hidden=m.mode!=='personal';
-  if (m.mode==='personal') renderPersonal(); else clearPersonal();
-  renderWork(); el('sleep-screen').hidden=m.screen_awake;
-  el('demo-controls').hidden=!m.demo_controls;
-  el('demo-scenarios').hidden=!m.demo_controls || m.sensors.source!=='demo';
-  const signature = JSON.stringify(m.profiles);
-  if (signature!==profileSignature) {
-    profileSignature=signature; el('demo-profiles').replaceChildren();
-    for (const p of m.profiles) {
-      const button=document.createElement('button'); button.type='button'; button.className='action-control'; button.dataset.profile=p.id; button.textContent=`Scan ${p.name}'s card`;
-      button.addEventListener('click',()=>action('/api/demo/scan',{profile_id:p.id})); el('demo-profiles').append(button);
-    }
-  }
-  document.querySelectorAll('[data-profile]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.profile===m.active_profile)));
-  write('connection','Display connected · '+formatTime(new Date())); clock();
-}
-async function post(path,payload) {
-  const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(60000)});
-  const data=await response.json(); if(!response.ok) throw new Error(data.error || 'Request failed'); return data;
-}
-async function action(path,payload) {
-  if(actionBusy) return;
-  actionBusy=true; const version=++requestVersion;
-  document.querySelectorAll('.action-control').forEach(b=>b.disabled=true);
-  try { const data=await post(path,payload); if(version===requestVersion) { dashboard=data; render(); } }
-  catch(error) { write('notice',error.message); }
-  finally { actionBusy=false; document.querySelectorAll('.action-control').forEach(b=>b.disabled=false); }
-}
-async function update() {
-  if(actionBusy || pollBusy) return;
-  pollBusy=true;
-  const version=++requestVersion;
+async function refresh(path='/api/dashboard', payload) {
+  const seq = ++sequence;
   try {
-    const response=await fetch('/api/dashboard',{cache:'no-store',signal:AbortSignal.timeout(5000)});
-    if(!response.ok) throw new Error('Unavailable');
-    const data=await response.json(); if(version===requestVersion) { dashboard=data; render(); }
-  } catch { if(version===requestVersion) write('connection','Mirror server unavailable · displayed information may be stale'); }
-  finally {pollBusy=false;}
-}
-el('personal-mode').addEventListener('click',()=>action('/api/mode',{mode:'personal'}));
-el('work-mode').addEventListener('click',()=>action('/api/mode',{mode:'work'}));
-el('privacy').addEventListener('click',()=>{privacyHidden=!privacyHidden;privacy();});
-el('wake').addEventListener('click',()=>action('/api/wake',{}));
-document.querySelectorAll('[data-scenario]').forEach(b=>b.addEventListener('click',()=>action('/api/demo/scenario',{scenario:b.dataset.scenario})));
-el('review-message').addEventListener('click',async()=>{
-  const text=el('message-text').value.trim();
-  if(!text) {write('review-progress','Enter a message first.'); return;}
-  const requestedIdentity=identity;
-  const requestedVersion=++reviewVersion;
-  el('review-message').disabled=true; write('review-progress','Checking…'); el('review-result').hidden=true;
-  try {
-    const result=await post('/api/message-review',{text});
-    if(identity!==requestedIdentity || reviewVersion!==requestedVersion) return;
-    write('review-method',result.method); write('review-verdict',result.verdict); write('review-summary',result.summary);
-    list('review-signals',result.signals,(row,s)=>{row.textContent=s.title;secondary(row,s.detail);});
-    write('review-next',result.next_step); write('review-ai',result.ai_note ? 'Optional AI explanation: '+result.ai_note : result.ai_error || '');
-    el('review-result').hidden=false; write('review-progress','Review complete.');
-  } catch(error) {if(identity===requestedIdentity && reviewVersion===requestedVersion) write('review-progress',error.message);}
-  finally {el('review-message').disabled=false;}
-});
-document.addEventListener('keydown',e=>{
-  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
-  if(e.key.toLowerCase()==='p') {privacyHidden=!privacyHidden;privacy();}
-  if(e.key.toLowerCase()==='m' && dashboard) action('/api/mode',{mode:dashboard.mirror.mode==='personal'?'work':'personal'});
-  if(e.key.toLowerCase()==='f') {
-    const task=document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); task.catch(()=>{});
+    const response = await fetch(path, {cache:'no-store',signal:AbortSignal.timeout(5000), ...(payload ? {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)} : {})});
+    if (!response.ok) throw Error(`Request failed (${response.status})`);
+    const data = await response.json();
+    if (seq === sequence) { render(data); $('demo-error').textContent = ''; }
+  } catch(e) {
+    if (seq === sequence) { state = null; clearPrivate(); $('demo-error').textContent = 'Mirror disconnected. Check the Python window.'; }
   }
+}
+function toggleDemo() {
+  if (!state?.mirror.demo_controls) return;
+  const key = JSON.stringify(state.mirror.profiles);
+  if (key !== profilesKey) {
+    $('profile-buttons').replaceChildren();
+    state.mirror.profiles.forEach(p => { const b = document.createElement('button'); b.textContent = `Scan ${p.name}`; b.onclick = () => { $('demo').close(); refresh('/api/demo/scan',{profile_id:p.id}); }; $('profile-buttons').append(b); });
+    profilesKey = key;
+  }
+  $('demo').open ? $('demo').close() : $('demo').showModal();
+}
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { $('demo').close(); refresh('/api/mode',{mode:b.dataset.mode}); });
+document.querySelectorAll('[data-scenario]').forEach(b => b.onclick = () => { $('demo').close(); refresh('/api/demo/scenario',{scenario:b.dataset.scenario}); });
+$('finish').onclick = () => { $('demo').close(); refresh('/api/welcome',{}); };
+$('close-demo').onclick = () => $('demo').close();
+addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  if (key === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); return; }
+  if (key === 'd') { toggleDemo(); return; }
+  if (key === 'escape') { refresh('/api/welcome',{}); return; }
+  if (!state?.mirror.demo_controls) return;
+  if (['arrowleft','arrowright','1','2','h','n','o','b','i'].includes(key)) { e.preventDefault(); if ($('demo').open) $('demo').close(); }
+  if (key === '1' || key === '2') { const p = state.mirror.profiles[Number(key)-1]; if(p) refresh('/api/demo/scan',{profile_id:p.id}); }
+  if (key === 'arrowright' || key === 'arrowleft') refresh('/api/mode',{mode:key === 'arrowright' ? 'work' : 'personal'});
+  const scenarios = {h:'hot',n:'normal',o:'offline',b:'near',i:'away'};
+  if (scenarios[key]) refresh('/api/demo/scenario',{scenario:scenarios[key]});
 });
-privacy(); clock(); setInterval(clock,1000); update(); setInterval(update,2000);
+async function poll() { await refresh(); setTimeout(poll,1000); }
+poll();

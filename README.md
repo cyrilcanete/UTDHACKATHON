@@ -1,139 +1,171 @@
-# Morning Mirror
+# Smart Mirror — Cyril and Sarah
 
-Two RFID cards select two people. A rotary encoder selects Personal or Work mode for the active person. Built for an Arduino Uno R3 and Raspberry Pi 4B (2GB); all software features can be developed on a Windows PC without hardware.
+This update is based on `mirror-update` commit `b8affb9`, retaining its card IDs and UNO Q bridge. It also supports the Uno R3 + Raspberry Pi 4 USB-serial arrangement. Use the transport that matches where your existing hardware code runs; don't change working wiring just to match a reference sketch.
 
-## Run the demo now
+## What the mirror does
 
-From the project folder, run:
+| Input | Result |
+| --- | --- |
+| Startup | Black welcome screen with cursive **hello** |
+| Cyril's card `F0 E2 E5 5C` | Cyril's Personal screen |
+| Sarah's key `87 4B BA 62` | Sarah's Personal screen |
+| Right / negative encoder delta | Work mode |
+| Left / positive encoder delta | Personal mode |
+| Encoder press | Welcome; active profile cleared |
+| Turn while on welcome | Stays on welcome until a recognized card is scanned |
 
-```powershell
-py app.py
-```
+Every recognized scan returns to Personal. Sarah retains the internal ID `partner`, preserving existing tokens and caches; the visible name is Sarah. Existing `Partner` display names migrate in memory. RFID selects a profile; it is not strong authentication.
 
-On Linux/Pi use `python3 app.py`. Open **http://127.0.0.1:5000** in a browser on that same computer. Stop an existing copy with Ctrl+C before starting the new one. The demo needs Python 3.10+ and no account credentials, model, sensor or third-party packages. If Windows reports a missing timezone database, install the included requirements in a virtual environment.
+The display is a 1920×1080 canvas scaled to the actual browser viewport, with safe margins, narrow side columns and a clear central mirror area. Long content advances through pages every 14 seconds, without dropping words. The mouse cursor is hidden. The welcome font is bundled locally, with its license, so it needs no internet. Use browser full screen (F or F11); if the monitor itself crops the image even in full screen, disable its overscan / select “Just Scan” or “Screen Fit”.
 
-- Click **Scan Cyril's card** or **Scan Partner's card** to simulate an RFID profile selection.
-- Click **Personal** or **Work**, or press **M**. Each person's chosen mode is remembered until the server restarts.
-- Personal shows that person's fictional schedule, inbox, focus tasks and briefing. Try the example messages in **Message check**.
-- Work shows shared room temperature, humidity, motion, threshold alerts and a handoff note. Try **Cooling issue**, **Low humidity**, **Sensor offline**, and **Normal**.
-- **P** toggles personal display details; **F** toggles full screen. Shortcuts are ignored while typing in the message box.
-- Demo account data and simulated sensor readings are labeled separately. No external service is contacted in demo mode, even if `ai_enabled` is true.
+## Try it on your laptop — no hardware required
 
-The mirror runs a local Python HTTP server, not Flask. Its existing address is still `127.0.0.1:5000`.
+1. Extract the ZIP into a **new folder**.
+2. Open its `UTDHACKATHON` folder.
+3. Double-click **OPEN_MIRROR_DEMO.cmd**. Keep that command window running. It opens `http://127.0.0.1:5001`.
+4. You should see only **hello**. Press **1** to simulate Cyril's card, or **2** for Sarah.
+5. Press **right arrow** for Work and **left arrow** for Personal.
+6. Press **Escape** to simulate pushing the knob. Turn again: it stays on welcome until another card scan.
+7. In Work, press **H** for hot conditions, **O** for missing sensor data, or **N** for normal readings.
+8. Press **D** to open/close the laptop demo button panel. Press **F** for full screen.
 
-## Configure the two people and their cards
+The launcher deliberately forces fictional accounts and simulated sensors; it never contacts Google, Ollama or Nemotron. The clean mirror screen has no permanently visible demo buttons. On Linux, use `MIRROR_DEMO=1 python3 app.py`, then port 5000.
 
-The app uses `config.json` when present, otherwise `config.example.json`. Copy the example to `config.json` only if you do not already have a config; keep your existing settings. Restart after editing.
+To copy this update into your existing Windows clone, double-click **COPY_UPDATE_TO_REPO.cmd** in the extracted folder. It defaults to `%USERPROFILE%\Downloads\UTDHACKATHON-git`, asks for another path if needed, backs up changed source files, and preserves `config.json`, `private/`, `.git/` and `.venv/`. It does not commit or push. Afterwards, review `git diff` and commit your source changes normally. Stop the old server and run the updated copy, not another extracted folder.
 
-```json
-"profiles": [
-  {"id": "cyril", "name": "Cyril", "rfid_uids": ["04 A1 B2 C3"], "tasks": ["Prepare the demo"]},
-  {"id": "partner", "name": "Partner", "rfid_uids": ["12 34 56 78"], "tasks": ["Review the checklist"]}
-]
-```
+## HC-SR501 motion brightness
 
-These are fields inside the config object. **Replace the example UIDs with your actual card IDs.** Empty UID lists are intentional in the shipped config. Rename Partner to your girlfriend's preferred name. Card identifiers are normalized across spaces, colons, dashes and letter case. Each UID can belong to one profile; unknown cards keep the current profile and show their UID so you can register them. Card selection does not require writing personal information to the cards.
+The existing PIR input now controls **displayed content brightness** automatically, including the hello screen. Motion makes it fully bright. After 60 seconds without reported motion it fades to 20% brightness. Card scans and knob input also brighten it. Motion alone never selects a person or exits welcome. Missing/stale PIR data leaves it fully bright so a disconnected sensor cannot strand it dimmed.
 
-Older configs without `profiles` get the existing owner's name/tasks plus a separate Partner demo profile. To customize those or register cards, add the profiles list above. RFID and demo controls select a display profile; they are not secure authentication or a screen lock.
+This is a browser brightness effect, not monitor-backlight control or monitor power saving. A PIR detects movement, not exact distance or a motionless person's presence. The countdown begins after the sensor stops reporting motion; its own hardware hold time can delay that. Keep sending the current `motion` boolean regularly, as the supplied sketches already do. No wiring changes are required if PIR data is already reaching the app.
 
-## Software interface for your hardware partner
-
-The Arduino should send **one UTF-8 JSON object per line**, ending each with a newline. Use these exact keys and units:
-
-```json
-{"type":"rfid","uid":"04 A1 B2 C3"}
-{"type":"sensors","temperature_c":24.5,"humidity_pct":48.0,"motion":true}
-{"type":"mode","mode":"work"}
-```
-
-- **Rotary encoder:** use clockwise to select Work and counterclockwise to select Personal. Have the Arduino translate each completed encoder step into one of the explicit mode events below. These select a mode directly, so repeated events never toggle back accidentally.
+These defaults also apply to old configs that omit the new settings. Adjust these fields inside `sensors` if desired:
 
 ```json
-{"type":"mode","mode":"work"}
-{"type":"mode","mode":"personal"}
+"motion_dimming": true,
+"dim_after_seconds": 60,
+"dim_brightness": 0.2
 ```
 
-- Mode events apply to the currently selected person. For example, scan Cyril, turn to Work, scan Partner (their own saved mode appears), then turn to Personal. A mode event also wakes the dashboard. The browser reflects hardware changes on its next poll, normally within two seconds.
-- The same mode JSON works over USB serial or through the existing local HTTP bridge. In the browser, keep the Personal/Work buttons and M shortcut for software-only testing. No extra RFID card is needed for mode selection.
-- Send RFID events on scans; send temperature/humidity at a sensor-appropriate interval (e.g. every 2 seconds for a DHT11), and motion updates regularly.
-- A combined object with `uid`, `mode` and sensor fields is also accepted. `type` can be omitted. When both uid and mode are sent, the recognized card selects the person before that person's mode is set. An unassigned card never changes the active person's mode.
-- Use numbers for temperature in Celsius and humidity in percent, and JSON `true`/`false` for motion. Use `null` for a failed temperature/humidity read. Do not send Arduino `nan` strings or numeric 0/1 for motion.
-- Sensor readings are shared between people. Scanning a card never makes old sensor data fresh.
-- Malformed, oversized or startup/debug lines are ignored; the next valid JSON line is processed. Partial serial reads are buffered.
+Leave `motion_sleep` false for dimming without the older sleep behavior. Laptop demo: **I** simulates the completed idle timeout immediately; **B** simulates movement and brightens it. Both are also in the **D** demo panel. Actual hardware always uses the configured timeout.
 
-### Option A: USB serial directly into this app
+## Real hardware: exact event protocol
 
-On the computer/Pi physically connected to the Uno, use its Python environment:
+The backend accepts one JSON object per line over USB serial, or the same object through the explicitly enabled local HTTP bridge. Existing direct `mode` events remain supported.
+
+```json
+{"type":"rfid","uid":"F0 E2 E5 5C"}
+{"type":"encoder","delta":-1}
+{"type":"encoder","delta":1}
+{"type":"encoder","action":"press"}
+{"type":"sensors","temperature_c":24.0,"humidity_pct":48.0,"motion":true}
+```
+
+`direction: "right"` / `"decrement"` and `"left"` / `"increment"` are also accepted instead of delta. Debounce the button and send one event per completed detent. Explicit `{"type":"mode","mode":"welcome"}` is also accepted for older bridge code. Send scans separately from mode events.
+
+Send DHT11 temperature in **Celsius**, humidity in **percent**, and motion as JSON true/false. Send `null` for failed readings; never send `nan`, fake normal values or boolean numbers. The reference sketches sample about every 2.2 seconds. Values older than 15 seconds (configurable) become unavailable. Card/encoder events never refresh sensor timestamps. Weather is separately labelled outdoors in Fahrenheit.
+
+### Uno R3 connected to the Pi by USB
+
+On the Pi, in the updated project folder:
 
 ```bash
-python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-hardware.txt
 .venv/bin/python -m serial.tools.list_ports
 ```
 
-On Windows the equivalent Python is `.venv\Scripts\python.exe`. Set your actual device and baud rate in `config.json`:
+Use the **actual device listed**, for example:
+
+```bash
+.venv/bin/python configure_hardware.py --source serial --port /dev/ttyACM0 --baud 9600
+.venv/bin/python app.py
+```
+
+The configuration helper backs up existing config, preserves account/card settings and selects real sensor input. Account data remains demo data unless you add `--live-accounts`. Do **not** use OPEN_MIRROR_DEMO.cmd when testing real sensors. Close Arduino Serial Monitor so only the mirror reads the serial port.
+
+The optional `hardware/uno_r3_mirror/uno_r3_mirror.ino` integrates RC522, encoder, DHT11 and PIR. It needs the Arduino libraries **MFRC522**, **DHT sensor library**, and **Adafruit Unified Sensor**. Reference pins: RC522 SS10/RST5/SPI11–13, encoder CLK2/DT3/SW6, DHT4, PIR7. **Match the constants in mirror_inputs.h to your verified wiring before uploading.** It has not been compiled or physically tested on your board here. If physical right reports a positive delta, flip `REVERSE_ENCODER`; the dashboard consistently maps negative to Work.
+
+### Existing UNO Q App Lab + Pi display arrangement
+
+The prior branch uses UNO Q RouterBridge and a shared event journal. This update preserves that route and extends it for sensors/encoder. On the UNO Q, stop the dashboard and App Lab app, then run:
+
+```bash
+.venv/bin/python setup_uno_q_rfid.py --app-path "$HOME/ArduinoApps/rfid_test"
+.venv/bin/python configure_hardware.py --source uno_q
+```
+
+Use your actual App Lab app path. Setup backs up/replaces Python callbacks and keeps your MCU sketch intact. To integrate with your already-verified sensor sketch, emit these callbacks:
+
+```cpp
+Bridge.notify("on_mirror_encoder", -1); // right
+Bridge.notify("on_mirror_encoder", 1);  // left
+Bridge.notify("on_mirror_press");       // debounced press
+Bridge.notify("on_mirror_sensors", temperatureC, humidityPercent, motion);
+```
+
+The existing `on_rfid_uid` callback is unchanged. For a failed DHT value, the supplied UNO Q sketch sends `-999.0f`, which the Python callback converts to null. The updated reference sketch and dependencies are in `hardware/uno_q_rfid/sketch/`; review its pin constants before replacing a tested sketch. Restart App Lab and the dashboard. Both must run for input to reach the display. Existing SSH forwarding to dashboard port 5000 can remain in use. The callbacks skip historical events at startup, so scan again after restarting.
+
+### Existing HTTP hardware reader
+
+Select `python3 configure_hardware.py --source http`. POST the event JSON to `http://127.0.0.1:5000/api/hardware` with `Content-Type: application/json`, from the same host as the backend. This endpoint is disabled for other sources. No new public network listener is opened.
+
+## Personal: explain suspicious inbox messages
+
+With live Google accounts connected, every inbox refresh (about five minutes) also performs this **read-only** Gmail search:
+
+```text
+in:inbox newer_than:30d {free "last chance" "act now" urgent "verification code" "gift card"}
+```
+
+It reviews up to 10 search matches, including read messages. It explains matched phrases, pressure, requests for credentials/codes, money and links, then suggests independent verification through a known official channel. A keyword is a review signal, not proof of phishing. “Free” by itself is common in legitimate promotions. The search is limited, not a full inbox/security audit.
+
+Example: **“Last chance! Act now to claim your free prize. Pay a processing fee and send your verification code.”** The demo explains the pressure, payment and code-sharing signals. It does not visit links, download attachments, send messages, delete mail or mark messages read. Message bodies stay backend-side; subject/sender and short matched phrases are displayed and may be cached privately. No match does not mean an email is safe.
+
+Reference guidance: [FTC phishing advice](https://consumer.ftc.gov/articles/how-recognize-avoid-phishing-scams). The UI labels local rules honestly; this is not a trained fraud classifier.
+
+## Work: from sensor readings to an operator handoff
+
+Work mode combines fresh environmental readings, configured equipment context, related work orders and verification steps. Out-of-range or missing readings create a **local incident record** with evidence and an ID. Repeat polling does not create duplicate incidents. Recovery is recorded as needing operator review, not proof a repair occurred. Demo records stay in memory; live records are stored in `private/incidents.json`. Nothing is sent to a ticket system or another person. Old records are bounded to 100.
+
+Add a `facility` object to your existing config to replace the explicitly labelled example room context:
 
 ```json
-"sensors": {
-  "source": "serial",
-  "port": "/dev/ttyACM0",
-  "baudrate": 9600,
-  "stale_after_seconds": 15,
-  "temperature_alert_c": 30,
-  "humidity_min_pct": 30,
-  "humidity_max_pct": 60,
-  "motion_sleep": false,
-  "idle_seconds": 120
+"facility": {
+  "asset": {"id": "ROOM-01", "name": "Project room", "depends_on": ["Nearby equipment"]},
+  "work_orders": [{"id": "WO-001", "asset_id": "ROOM-01", "summary": "Inspect room ventilation", "status": "open"}],
+  "procedures": ["Verify with a second reading.", "Check visible airflow obstructions.", "Notify the responsible operator if conditions persist."]
 }
 ```
 
-Examples of other ports are `/dev/ttyUSB0`, `/dev/serial/by-id/...`, or `COM3` on Windows. Match the sketch's `Serial.begin(...)`. Close the IDE Serial Monitor and other serial readers before starting the mirror. If Linux reports permission denied, ensure the mirror user has access to the device (commonly membership in `dialout`, followed by a new login). Run `.venv/bin/python app.py` so the optional dependency is available. The reader retries after unplug/replug errors.
+These are **your configured records**, not a claimed live CBRE/equipment-system integration. A DHT11 cannot diagnose a failed component or prove a cascading failure.
 
-Keep `demo: true` while mixing fictional accounts with **real** sensor input. The Work panel will label its readings SERIAL. Switch to `demo: false` when using real account data; the software scan buttons will then disappear.
+### Optional Nemotron workflow
 
-### Option B: an existing local hardware bridge
+`nemotron_agent.py` implements a bounded NIM-compatible tool loop using `read_environment`, `lookup_asset`, `lookup_work_orders` and `lookup_procedure`. A completed result requires all four tools. Unknown tools/arguments and incomplete workflows are rejected; failures leave the local rules visible. The agent has no inbox, messaging or equipment-control tools. Requests run in the background, only in live Work mode with changed sensor evidence, at most once per five minutes.
 
-If your partner already has code reading the hardware, set `sensors.source` to `"http"`. That code can POST the same JSON to **http://127.0.0.1:5000/api/hardware** with `Content-Type: application/json`. The bridge and mirror backend must run on the same computer; this is not a network-exposed endpoint. The HTTP bridge is disabled unless explicitly selected.
+It is **disabled by default**, makes no paid calls in this delivery and has only been tested with mocked model responses. To use your provisioned endpoint later, set `nemotron.enabled: true`, `nemotron.endpoint` to its complete chat/completions URL, and `nemotron.model` to its actual Nemotron model ID. Set `NVIDIA_API_KEY` in the server environment if your endpoint needs it; never commit keys. Check your provider's access/billing before enabling. Do not claim a live NVIDIA demonstration until you have verified it with your endpoint. [NVIDIA tool calling documentation](https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html).
 
-### Motion and lost connections
+## Separate Google accounts and existing AI briefing
 
-Set `motion_sleep: true` to blank the dashboard after `idle_seconds` without motion. A motion event, recognized card scan, mode selection or **Wake display** restores it. This is a black browser overlay; it does not cut monitor power. Missing/stale motion readings leave the display awake. Missing, invalid or stale temperature/humidity readings show **unavailable**, never a healthy default. A disconnected serial reader exposes an error and retries. Alert limits are configurable demo settings for a shared room; this prototype is not an actual data-center monitoring deployment.
+Keep your existing `config.json` and `private/`. The owner (`owner_profile_id: "cyril"`) keeps `private/token.json`; Sarah keeps `private/profiles/partner/token.json`. No fallback to the other person's account is allowed. Welcome and Work API responses omit personal inbox/calendar/briefing/tasks.
 
-## Google accounts remain separate
-
-The owner identified by `owner_profile_id` (default `cyril`) preserves the existing `private/token.json` and `private/cache.json`. Other profiles use `private/profiles/PROFILE_ID/token.json` and their own cache; they never fall back to the owner's token. Keep the owner id unchanged when renaming/reordering display profiles.
-
-Install `requirements.txt` in a virtual environment. Using your Google Desktop-app OAuth project with Gmail API and Calendar API enabled, put its downloaded client JSON at `private/credentials.json`. Add both intended accounts as test users when required by your OAuth project's testing settings. Stop the mirror and run each authorization on the computer whose browser will complete the sign-in:
+Install `requirements.txt` in your virtual environment. With Gmail and Calendar APIs enabled in your Google Desktop-app OAuth project, put the downloaded client JSON at `private/credentials.json`. Authorize each profile using its correct account:
 
 ```bash
 .venv/bin/python google_auth.py --profile cyril
 .venv/bin/python google_auth.py --profile partner
 ```
 
-Choose the correct person's account each time, then set `demo: false`. Scopes stay read-only. A profile can optionally specify a different `calendar_id`. Credentials, tokens, private caches and your local config remain excluded from Git. Work API responses omit personal calendar, inbox, briefing and tasks.
+Then set `demo: false` or use `configure_hardware.py --source ... --live-accounts`. Scopes stay read-only. Google setup and network availability are needed for real messages; demo examples work without either.
 
-## Message checking and AI
+The existing `ai_enabled`, `ollama_url` and `ollama_model` settings still control the optional personal briefing. Model execution belongs on a capable PC/server, not a large model on the Pi. AI is separate from the local phishing rules and disabled by default.
 
-Message check runs locally without a model: it highlights urgency, requests for codes/credentials, payments and external links, and suggests independent verification. The page labels this **rule-based**. It can miss fraud and does not verify senders. Example messages are fictional, with non-working `.invalid` links. Message text is processed in memory; this feature does not save it, open links, or send/modify emails.
-
-The existing AI briefing still uses the configured Ollama server and model. When `demo` is false and `ai_enabled` is true, manually checking a message also requests an optional AI explanation from that server; that text is sent to the configured server. An unavailable model leaves the rule-based result usable. Work handoff notes are generated directly from sensor readings/thresholds and are labeled accordingly. No paid API or new AI provider is enabled.
-
-Run the model on your PC rather than the 2GB Pi. If Ollama is already running on your Windows PC at localhost:11434, you can keep it local and forward it to the Pi using PowerShell (replace the login and IP):
-
-```powershell
-ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -R 11434:127.0.0.1:11434 YOUR_PI_USERNAME@YOUR_PI_IP
-```
-
-Keep the terminal and PC awake. The Pi can then retain `ollama_url: "http://127.0.0.1:11434"`. Account connection, physical devices, model generation and your event's sponsor eligibility require their own verification; this change does not claim a working tool-using sponsor agent.
-
-## Tests
+## Tests and restart
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-Backend tests cover both people, per-profile workers/storage, mode memory, card mapping, malformed/fragmented serial input, sensor freshness, motion timeout/wake, HTTP origin/input validation, demo isolation, account-data omission in Work mode and message-check behavior.
+With Playwright and Chromium installed: `node tests/browser_smoke.cjs`. The test starts its own demo backend on port 5091, exercises the session flow and checks 1920×1080, 1920×1000 and 1366×768 viewports, cursor/font, missing sensors, and long-text pagination. `CHROMIUM_EXECUTABLE_PATH` can select an installed browser.
 
-A browser smoke test is in `tests/browser_smoke.cjs`. With Playwright and its Chromium browser installed, start the demo in another terminal, then run `node tests/browser_smoke.cjs`. Optionally set `MIRROR_TEST_ARTIFACTS` to a directory for screenshots. It exercises profile switching, modes, message examples, simulated incidents, recovery, privacy, typing shortcuts and mobile layouts.
-
-If you already run `smartmirror.service` or `smart-mirror.service`, ensure that service uses this checkout and its Python environment, then restart the existing service. The included `install_service.py` can instead install a per-user `smart-mirror.service`; run it with the venv Python and without sudo. Use only one service/server on port 5000.
+Restart your existing mirror service after updating its checkout. The supplied `install_service.py` optionally installs a per-user service; use only one server on port 5000. This update does not install a second service or change your existing boot/tunnel setup automatically.

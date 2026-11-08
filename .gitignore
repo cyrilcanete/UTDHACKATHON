@@ -3,3 +3,5 @@ __pycache__/
 config.json
 private/
 *.log
+config.json.*.bak
+.mirror-rfid/

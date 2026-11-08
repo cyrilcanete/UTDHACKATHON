@@ -15,7 +15,9 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 from mirror_runtime import MirrorRuntime, profile_config, profiles_for, serial_worker
-from message_review import SAMPLES, review_message
+from message_review import SAMPLES, review_message, PHISHING_QUERY, review_inbox_messages
+from work_assistant import WorkAssistant
+from rfid_bridge import rfid_worker
 
 BASE = Path(__file__).resolve().parent
 PRIVATE = BASE / "private"
@@ -23,6 +25,7 @@ LOCK = threading.Lock()
 STATE = {}
 PROFILE_STATES = {}
 RUNTIME = None
+WORK = None
 
 def stamp():
     return datetime.now(timezone.utc).isoformat()
@@ -142,7 +145,17 @@ def inbox(cfg):
             "subject": headers.get("subject", "(No subject)"),
             "received": datetime.fromtimestamp(int(msg["internalDate"])/1000, timezone.utc).isoformat(),
             "body": plain_body(msg["payload"]) if cfg.get("ai_enabled") else ""})
-    return {"unread": label.get("messagesUnread", 0), "messages": messages}
+    # Separate bounded search includes read messages, without marking mail read.
+    matches = service.users().messages().list(userId="me", q=PHISHING_QUERY, maxResults=10).execute()
+    candidates = []
+    for ref in matches.get("messages", []):
+        msg = service.users().messages().get(userId="me", id=ref["id"], format="full").execute()
+        headers = {h["name"].lower(): h["value"] for h in msg["payload"].get("headers", [])}
+        candidates.append({"id": "mail:" + msg["id"], "subject": headers.get("subject", "(No subject)"),
+                           "sender": headers.get("from", "Unknown"), "body": plain_body(msg["payload"])})
+    return {"unread": label.get("messagesUnread", 0), "messages": messages,
+            "reviews": review_inbox_messages(candidates), "review_query": PHISHING_QUERY,
+            "review_scope": "Up to 10 matching inbox messages from the last 30 days; not a complete security scan."}
 
 def validate_briefing(value, valid_ids):
     if not isinstance(value, dict) or not isinstance(value.get("summary"), str):
@@ -188,12 +201,13 @@ def demo_data(cfg):
     return {"weather": {"temperature": 72, "feels_like": 73, "condition": "Partly cloudy", "high": 78, "low": 61, "rain": 35},
         "calendar": [{"id": "event:demo", "title": meeting, "start": (now+timedelta(minutes=45)).isoformat(),
                       "end": (now+timedelta(minutes=90)).isoformat(), "all_day": False, "location": "Study room"}],
-        "inbox": {"unread": 2, "messages": [{"id": "mail:demo", "sender": "Example teammate", "subject": subject, "received": now.isoformat(), "body": ""}]},
+        "inbox": {"unread": 2, "messages": [{"id": "mail:demo", "sender": "Example teammate", "subject": subject, "received": now.isoformat(), "body": ""}], "reviews": review_inbox_messages([{ "id": "mail:example-prize", "subject": "Fictional example: free prize", "sender": "Example sender", "body": SAMPLES[3]["text"]}]), "review_scope": "Fictional example · no real inbox searched"},
         "briefing": {"summary": summary, "action_items": [{"text": "Review your demo schedule" if partner else "Bring project notes", "source_ids": ["mail:demo"]}]}}
 
 def initialize(cfg):
-    global STATE, PROFILE_STATES, RUNTIME
+    global STATE, PROFILE_STATES, RUNTIME, WORK
     RUNTIME = MirrorRuntime(cfg)
+    WORK = WorkAssistant(cfg, PRIVATE / "incidents.json", private_write)
     PROFILE_STATES = {}
     for profile in RUNTIME.profiles:
         effective = profile_config(cfg, profile["id"])
@@ -229,12 +243,15 @@ def personal_snapshot(cfg, profile_id):
 def public_state(cfg):
     runtime = RUNTIME.snapshot()
     profile_id = runtime["active_profile"]
-    effective = profile_config(cfg, profile_id)
+    effective = profile_config(cfg, profile_id) if profile_id else dict(cfg, name="", tasks=[])
     # Work responses omit personal widgets entirely. UI switching cannot leak a prior profile.
     result = personal_snapshot(effective, profile_id) if runtime["mode"] == "personal" else {}
     result["settings"] = {k: effective[k] for k in ("name", "timezone", "location", "demo", "tasks")}
-    if runtime["mode"] == "work":
+    if runtime["mode"] != "personal":
         result["settings"]["tasks"] = []
+    if runtime["mode"] == "work":
+        runtime["work"]["assistant"] = WORK.assess(runtime)
+    result["build"] = "mirror-welcome-v3"
     result["mirror"] = runtime
     result["message_samples"] = SAMPLES if runtime["mode"] == "personal" else []
     return result
@@ -287,10 +304,11 @@ def worker(cfg, stop, profile_id=None):
                 print("Cache could not be saved", flush=True)
         stop.wait(2)
 
-def handler_for(cfg):
+def handler_for(cfg, port=5000):
+    local_hosts = (f"127.0.0.1:{port}", f"localhost:{port}")
     class Handler(BaseHTTPRequestHandler):
         def trusted_request(self):
-            hosts = ("127.0.0.1:5000", "localhost:5000")
+            hosts = local_hosts
             if self.headers.get("Host") not in hosts:
                 return False
             origin = self.headers.get("Origin")
@@ -310,7 +328,7 @@ def handler_for(cfg):
             if not self.trusted_request():
                 self.reply({"error": "Local same-origin requests only"}, 403)
                 return
-            routes = ("/api/mode", "/api/demo/scan", "/api/demo/scenario", "/api/hardware", "/api/message-review", "/api/wake")
+            routes = ("/api/mode", "/api/demo/scan", "/api/demo/scenario", "/api/hardware", "/api/message-review", "/api/wake", "/api/welcome")
             if self.path not in routes:
                 self.reply({"error": "Unknown route"}, 404)
                 return
@@ -328,7 +346,9 @@ def handler_for(cfg):
                 if self.path.startswith("/api/demo/") and not cfg["demo"]:
                     self.reply({"error": "Demo controls are disabled"}, 403)
                     return
-                if self.path == "/api/mode":
+                if self.path == "/api/welcome":
+                    RUNTIME.set_mode("welcome")
+                elif self.path == "/api/mode":
                     RUNTIME.set_mode(payload.get("mode"))
                 elif self.path == "/api/demo/scan":
                     RUNTIME.select_profile(payload.get("profile_id"))
@@ -364,12 +384,14 @@ def handler_for(cfg):
                 self.reply({"error": "Invalid request. Check the field names, types and allowed values."}, 400)
 
         def do_GET(self):
-            if self.headers.get("Host") not in ("127.0.0.1:5000", "localhost:5000"):
+            if self.headers.get("Host") not in local_hosts:
                 self.send_error(403)
                 return
             path = urlsplit(self.path).path
             if path == "/api/dashboard":
                 body, mime = json.dumps(public_state(cfg)).encode(), "application/json"
+            elif path == "/fonts/DancingScript.ttf":
+                body, mime = (BASE / "static/fonts/DancingScript.ttf").read_bytes(), "font/ttf"
             elif path in ("/", "/app.js", "/style.css"):
                 filename = {"/": "index.html", "/app.js": "app.js", "/style.css": "style.css"}[path]
                 mime = {"/": "text/html", "/app.js": "application/javascript", "/style.css": "text/css"}[path]
@@ -389,15 +411,29 @@ def handler_for(cfg):
             pass
     return Handler
 
+def launch_port():
+    try:
+        port = int(os.environ.get("MIRROR_PORT", "5000"))
+    except ValueError:
+        raise ValueError("MIRROR_PORT must be a number from 1 to 65535") from None
+    if not 1 <= port <= 65535:
+        raise ValueError("MIRROR_PORT must be a number from 1 to 65535")
+    return port
+
 def main():
     cfg = load_config()
+    if os.environ.get("MIRROR_DEMO") == "1":
+        cfg = dict(cfg, demo=True, sensors={"source": "demo"}, rfid={"source": "none"})
+    port = launch_port()
     initialize(cfg)
     stop = threading.Event()
-    server = ThreadingHTTPServer(("127.0.0.1", 5000), handler_for(cfg))
+    server = ThreadingHTTPServer(("127.0.0.1", port), handler_for(cfg, port))
     for profile in profiles_for(cfg):
         threading.Thread(target=worker, args=(cfg, stop, profile["id"]), daemon=True).start()
     threading.Thread(target=serial_worker, args=(RUNTIME, stop), daemon=True).start()
-    print("Mirror ready: http://127.0.0.1:5000 — " + ("DEMO" if cfg["demo"] else "LIVE"), flush=True)
+    threading.Thread(target=WORK.worker, args=(RUNTIME, stop), daemon=True).start()
+    threading.Thread(target=rfid_worker, args=(RUNTIME, stop), daemon=True).start()
+    print(f"Mirror ready: http://127.0.0.1:{port} — " + ("DEMO" if cfg["demo"] else "LIVE"), flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

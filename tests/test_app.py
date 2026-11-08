@@ -16,6 +16,7 @@ class Tests(unittest.TestCase):
     def setUp(self):
         self.cfg=json.loads((app.BASE/'config.example.json').read_text())
         app.initialize(self.cfg)
+        app.RUNTIME.select_profile("cyril")
 
     def test_demo_never_calls_services(self):
         from unittest.mock import patch

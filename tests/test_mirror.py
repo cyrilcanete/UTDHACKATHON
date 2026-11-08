@@ -20,14 +20,15 @@ class RuntimeTests(unittest.TestCase):
         self.cfg["profiles"][1]["rfid_uids"] = ["12 34 56 78"]
         self.now = 100.0
         self.runtime = MirrorRuntime(self.cfg, clock=lambda: self.now)
+        self.runtime.select_profile("cyril")
 
-    def test_each_card_selects_person_and_remembers_their_mode(self):
+    def test_each_card_selects_person_and_resets_to_personal(self):
         self.runtime.set_mode("work")
         self.runtime.scan("12-34-56-78")
         self.assertEqual(self.runtime.snapshot()["active_profile"], "partner")
         self.assertEqual(self.runtime.snapshot()["mode"], "personal")
         self.runtime.scan("04 a1 b2 c3")
-        self.assertEqual(self.runtime.snapshot()["mode"], "work")
+        self.assertEqual(self.runtime.snapshot()["mode"], "personal")
         self.assertFalse(self.runtime.scan("FFFFFFFF"))
         self.assertEqual(self.runtime.snapshot()["active_profile"], "cyril")
         self.assertIn("Unassigned", self.runtime.snapshot()["event"])
@@ -50,7 +51,7 @@ class RuntimeTests(unittest.TestCase):
         self.runtime.ingest({"type": "mode", "mode": "work"})
         self.runtime.ingest({"type": "mode", "mode": "personal"})
         self.runtime.scan("04A1B2C3")
-        self.assertEqual(self.runtime.snapshot()["mode"], "work")
+        self.assertEqual(self.runtime.snapshot()["mode"], "personal")
 
     def test_combined_card_and_mode_targets_selected_person(self):
         self.runtime.ingest({"uid": "12345678", "mode": "work"})
@@ -69,6 +70,7 @@ class RuntimeTests(unittest.TestCase):
     def test_mode_serial_packets_preserve_sensor_freshness(self):
         self.cfg["sensors"]["source"] = "http"
         runtime = MirrorRuntime(self.cfg, clock=lambda: self.now)
+        runtime.select_profile("cyril")
         runtime.ingest({"temperature_c": 23, "humidity_pct": 45})
         self.now += 20
         lines = SerialLines(runtime)
@@ -98,6 +100,7 @@ class RuntimeTests(unittest.TestCase):
     def test_rfid_never_refreshes_old_environmental_readings(self):
         self.cfg["sensors"]["source"] = "http"
         runtime = MirrorRuntime(self.cfg, clock=lambda: self.now)
+        runtime.select_profile("cyril")
         runtime.ingest({"temperature_c": 23, "humidity_pct": 45, "motion": True})
         self.now += 20
         runtime.ingest({"uid": "12345678"})
@@ -107,6 +110,7 @@ class RuntimeTests(unittest.TestCase):
     def test_partial_packets_do_not_refresh_other_fields(self):
         self.cfg["sensors"]["source"] = "http"
         runtime = MirrorRuntime(self.cfg, clock=lambda: self.now)
+        runtime.select_profile("cyril")
         runtime.ingest({"temperature_c": 23, "humidity_pct": 45})
         self.now += 20
         runtime.ingest({"motion": True})
@@ -133,6 +137,7 @@ class RuntimeTests(unittest.TestCase):
     def test_motion_timeout_card_wake_and_sensor_failure_fail_awake(self):
         self.cfg["sensors"].update(source="http", motion_sleep=True, idle_seconds=5, stale_after_seconds=20)
         runtime = MirrorRuntime(self.cfg, clock=lambda: self.now)
+        runtime.select_profile("cyril")
         runtime.ingest({"motion": False})
         self.now += 6
         self.assertFalse(runtime.snapshot()["screen_awake"])
@@ -153,7 +158,7 @@ class FeatureTests(unittest.TestCase):
         app.STATE["inbox"]["data"]["messages"][0]["subject"] = "OWNER ONLY"
         app.RUNTIME.select_profile("partner")
         state = app.public_state(self.cfg)
-        self.assertEqual(state["settings"]["name"], "Partner")
+        self.assertEqual(state["settings"]["name"], "Sarah")
         self.assertNotIn("OWNER ONLY", json.dumps(state))
         owner = app.profile_private(profile_config(self.cfg, "cyril"))
         partner = app.profile_private(profile_config(self.cfg, "partner"))
@@ -164,6 +169,7 @@ class FeatureTests(unittest.TestCase):
         self.assertEqual(app.profile_private(profile_config(self.cfg, "partner")), partner)
 
     def test_work_response_omits_calendar_inbox_tasks_and_briefing(self):
+        app.RUNTIME.select_profile("cyril")
         app.RUNTIME.set_mode("work")
         state = app.public_state(self.cfg)
         for key in ("calendar", "inbox", "briefing"):
@@ -224,7 +230,7 @@ class ApiTests(unittest.TestCase):
 
     def test_demo_scan_modes_and_scenarios(self):
         state = self.post("/api/demo/scan", {"profile_id": "partner"})
-        self.assertEqual(state["settings"]["name"], "Partner")
+        self.assertEqual(state["settings"]["name"], "Sarah")
         state = self.post("/api/mode", {"mode": "work"})
         self.assertNotIn("inbox", state)
         state = self.post("/api/demo/scenario", {"scenario": "hot"})

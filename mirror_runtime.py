@@ -20,8 +20,8 @@ def normalize_uid(value):
 def profiles_for(cfg):
     # Older config.json files get two profiles without losing the owner's settings.
     profiles = copy.deepcopy(cfg.get("profiles") or [
-        {"id": "cyril", "name": cfg["name"], "tasks": cfg["tasks"], "rfid_uids": []},
-        {"id": "partner", "name": "Partner", "tasks": ["Review today's schedule", "Prepare the project demo"], "rfid_uids": []},
+        {"id": "cyril", "name": cfg["name"], "tasks": cfg["tasks"], "rfid_uids": ["F0 E2 E5 5C"]},
+        {"id": "partner", "name": "Sarah", "tasks": ["Review today's schedule", "Prepare the project demo"], "rfid_uids": ["87 4B BA 62"]},
     ])
     if not isinstance(profiles, list) or not all(isinstance(p, dict) for p in profiles):
         raise ValueError("profiles must be a list of profile objects")
@@ -33,6 +33,8 @@ def profiles_for(cfg):
         seen_ids.add(pid)
         if not isinstance(profile.get("name"), str) or not profile["name"].strip():
             raise ValueError("Each profile needs a name")
+        if profile.get("name", "").strip().lower() == "partner":
+            profile["name"] = "Sarah"
         profile.setdefault("tasks", cfg["tasks"] if index == 0 else [])
         if not isinstance(profile["tasks"], list) or not all(isinstance(x, str) for x in profile["tasks"]):
             raise ValueError("Profile tasks must be a list of strings")
@@ -73,14 +75,19 @@ class MirrorRuntime:
         self.cfg, self.clock = cfg, clock
         self.lock = threading.RLock()
         self.profiles = profiles_for(cfg)
-        self.active = self.profiles[0]["id"]
+        self.active = None
         self.modes = {p["id"]: "personal" for p in self.profiles}
         self.uid_map = {uid: p["id"] for p in self.profiles for uid in p["rfid_uids"]}
         self.options = dict(cfg.get("sensors", {}))
         self.source = self.options.get("source", "demo" if cfg["demo"] else "none")
-        if self.source not in ("demo", "serial", "http", "none"):
-            raise ValueError("sensors.source must be demo, serial, http or none")
+        if self.source not in ("demo", "serial", "http", "uno_q", "none"):
+            raise ValueError("sensors.source must be demo, serial, http, uno_q or none")
         self.stale_after = self._number("stale_after_seconds", 15, 1, 3600)
+        self.motion_dimming = self.options.get("motion_dimming", True)
+        if type(self.motion_dimming) is not bool:
+            raise ValueError("motion_dimming must be true or false")
+        self.dim_after = self._number("dim_after_seconds", 60, 1, 86400)
+        self.dim_brightness = self._number("dim_brightness", 0.2, 0.05, 1)
         self.sleep_after = self._number("idle_seconds", 120, 1, 86400)
         self.hot_limit = self._number("temperature_alert_c", 30, -40, 125)
         self.humidity_low = self._number("humidity_min_pct", 30, 0, 100)
@@ -92,6 +99,7 @@ class MirrorRuntime:
         self.updated = None
         self.event = "Scan a card or choose a demo profile." if cfg["demo"] else "Scan your registered card to select a profile."
         self.transport_error = None
+        self.rfid_status = "RFID not connected"
         self.invalid_lines = 0
         self.scenario = "normal"
         if self.source == "demo":
@@ -108,14 +116,23 @@ class MirrorRuntime:
             if profile_id not in self.modes:
                 raise ValueError("Unknown profile")
             self.active = profile_id
+            self.modes[profile_id] = "personal"
             self.last_motion = self.clock()
             name = next(p["name"] for p in self.profiles if p["id"] == profile_id)
             self.event = f"Profile selected: {name}"
 
     def set_mode(self, mode):
+        if mode == "welcome":
+            with self.lock:
+                self.active = None
+                self.event = "Scan your card to begin."
+                self.last_motion = self.clock()
+            return
         if mode not in ("personal", "work"):
             raise ValueError("Mode must be personal or work")
         with self.lock:
+            if self.active is None:
+                return  # A knob turn cannot start a private session.
             self.modes[self.active] = mode
             self.last_motion = self.clock()
             name = next(p["name"] for p in self.profiles if p["id"] == self.active)
@@ -134,10 +151,29 @@ class MirrorRuntime:
         """Validate the whole event before changing state; missing/null readings stay unavailable."""
         if not isinstance(payload, dict):
             raise ValueError("Hardware event must be a JSON object")
-        if payload.get("type") not in (None, "rfid", "sensors", "mode"):
+        if payload.get("type") not in (None, "rfid", "sensors", "mode", "encoder"):
             raise ValueError("Unknown hardware event type")
         mode = payload.get("mode")
-        if ("mode" in payload or payload.get("type") == "mode") and mode not in ("personal", "work"):
+        if payload.get("type") == "encoder":
+            choices = []
+            if "action" in payload:
+                if payload["action"] not in ("press", "push"):
+                    raise ValueError("Unknown encoder action")
+                choices.append("welcome")
+            if "direction" in payload:
+                directions = {"right": "work", "decrement": "work", "left": "personal", "increment": "personal"}
+                if not isinstance(payload["direction"], str) or payload["direction"] not in directions:
+                    raise ValueError("Unknown encoder direction")
+                choices.append(directions[payload["direction"]])
+            if "delta" in payload:
+                delta = payload["delta"]
+                if type(delta) is not int or delta == 0:
+                    raise ValueError("Encoder delta must be a nonzero integer")
+                choices.append("work" if delta < 0 else "personal")
+            if not choices or len(set(choices)) != 1 or "uid" in payload or "mode" in payload:
+                raise ValueError("Use one consistent encoder event")
+            mode = choices[0]
+        if ("mode" in payload or payload.get("type") == "mode") and mode not in ("personal", "work", "welcome"):
             raise ValueError("Mode event needs mode: personal or work")
         fields = {}
         for key, low, high in (("temperature_c", -40, 125), ("humidity_pct", 0, 100)):
@@ -172,11 +208,15 @@ class MirrorRuntime:
     def demo_scenario(self, scenario):
         if self.source != "demo" or not self.cfg["demo"]:
             raise ValueError("Demo scenarios are disabled")
-        if scenario not in (*self.SCENARIOS, "offline"):
+        if scenario not in (*self.SCENARIOS, "offline", "near", "away"):
             raise ValueError("Unknown scenario")
         with self.lock:
             self.scenario = scenario
-            if scenario == "offline":
+            if scenario in ("near", "away"):
+                self.ingest({"motion": scenario == "near"})
+                if scenario == "away":
+                    self.last_motion = self.clock() - self.dim_after
+            elif scenario == "offline":
                 self.times.clear()
             else:
                 self.ingest(self.SCENARIOS[scenario])
@@ -200,6 +240,8 @@ class MirrorRuntime:
             attention = any(a["level"] == "warning" for a in alerts)
             status = "attention" if attention else "unknown" if alerts else "normal"
             awake = (not self.options.get("motion_sleep", False) or readings["motion"] is None or readings["motion"] is True or now - self.last_motion < self.sleep_after)
+            dimmed = self.motion_dimming and readings["motion"] is False and now - self.last_motion >= self.dim_after
+            brightness = self.dim_brightness if dimmed else 1.0
             temp_text = "unavailable" if readings["temperature_c"] is None else f"{readings['temperature_c']:g}°C"
             humidity_text = "unavailable" if humidity is None else f"{humidity:g}%"
             handoff = f"{self.source.upper()} readings: temperature {temp_text}; humidity {humidity_text}. "
@@ -207,7 +249,10 @@ class MirrorRuntime:
             return {
                 "active_profile": self.active,
                 "profiles": [{"id": p["id"], "name": p["name"]} for p in self.profiles],
-                "mode": self.modes[self.active], "event": self.event, "screen_awake": awake,
+                "mode": self.modes[self.active] if self.active else "welcome", "event": self.event, "screen_awake": awake,
+                "brightness": brightness,
+                "brightness_status": "dimmed" if dimmed else "full",
+                "rfid_status": self.rfid_status,
                 "sensors": {**readings, "source": self.source, "simulated": simulated, "updated": self.updated,
                             "status": status, "error": self.transport_error, "invalid_lines": self.invalid_lines},
                 "work": {"status": status, "alerts": alerts, "handoff": handoff, "scenario": self.scenario,
