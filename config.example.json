@@ -61,8 +61,12 @@
     "enabled": false,
     "allow_demo": false,
     "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
-    "model": "nvidia/nemotron-3-nano-30b-a3b",
-    "personal_enabled": false
+    "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "personal_enabled": false,
+    "request_timeout_seconds": 45,
+    "workflow_timeout_seconds": 120,
+    "max_rounds": 9,
+    "max_tokens": 1200
   },
   "encoder": {
     "detents_per_revolution": 20,
