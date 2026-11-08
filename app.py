@@ -194,16 +194,27 @@ def briefing(cfg, snapshot):
     return validate_briefing(json.loads(result["response"]), valid_ids)
 
 def demo_data(cfg):
-    now = datetime.now(timezone.utc)
     partner = cfg.get("_private_subdir") is not None
-    meeting = "Sensor validation review" if partner else "Smart Mirror project meeting"
-    subject = "Sensor checklist for our next review" if partner else "Bring your project notes"
-    summary = (f"{cfg['name']}, your planning session starts in 45 minutes. Bring your notes and review the sensor checklist before the meeting.")
+    summary = ("Sarah, you have a meeting in ECSW in 45 minutes, bring Calculus notes." if partner else
+               "Cyril, you have a Smart Mirror Project meeting on zoom at 1pm.")
+    schedule = (["Calculus Study Session Sunday", "Physics Exam Monday"] if partner else
+                ["Smart Mirror Presentation Monday at 1pm", "Doctor’s appointment Tuesday at 2:30pm."])
+    review = {"excerpt": "Complete your employee account verification at t-mobile-okta-security.com by EOD.",
+              "risk": "multiple warning signs", "method": "Training scenario review", "verdict": "Possible phishing",
+              "signals": [
+                  {"title": "Lookalike domain", "matches": ["t-mobile-okta-security.com"],
+                   "detail": "Uses fake lookalike domain: t-mobile-okta-security.com"},
+                  {"title": "High urgency", "matches": ["by EOD"], "detail": "High urgency: by EOD"}],
+              "next_step": "Ignore the email, log in strictly via your saved employee bookmarks, and report the message"}
+    reviews = [{"id": "mail:training-tmobile", "subject": "Possible Phishing Email from T-Mobile Identity Management",
+                "sender": "T-Mobile Identity Management", "review": review}] if partner else []
     return {"weather": {"temperature": 72, "feels_like": 73, "condition": "Partly cloudy", "high": 78, "low": 61, "rain": 35},
-        "calendar": [{"id": "event:demo", "title": meeting, "start": (now+timedelta(minutes=45)).isoformat(),
-                      "end": (now+timedelta(minutes=90)).isoformat(), "all_day": False, "location": "Study room"}],
-        "inbox": {"unread": 2, "messages": [{"id": "mail:demo", "sender": "Cyril" if partner else "Sarah", "subject": subject, "received": now.isoformat(), "body": ""}], "reviews": review_inbox_messages([{ "id": "mail:example-prize", "subject": "Account verification required" if partner else "Last chance: claim your free prize", "sender": "Account Support <support@account-check.invalid>" if partner else "Rewards Center <offers@rewards-center.invalid>", "body": SAMPLES[1 if partner else 3]["text"]}]), "review_scope": "Training messages · no real inbox searched"},
-        "briefing": {"summary": summary, "action_items": [{"text": "Review the sensor checklist" if partner else "Bring project notes", "source_ids": ["mail:demo"]}]}}
+        "calendar": [{"id": "event:demo-"+str(i), "title": title, "display_text": title,
+                      "start": "2026-11-08", "end": "2026-11-09", "all_day": True, "location": ""}
+                     for i,title in enumerate(schedule)],
+        "inbox": {"unread": 2 if partner else 3, "messages": [], "reviews": reviews,
+                  "review_scope": "Training messages · no real inbox searched"},
+        "briefing": {"summary": summary, "action_items": []}}
 
 def initialize(cfg):
     global STATE, PROFILE_STATES, RUNTIME, WORK, PERSONAL
@@ -255,7 +266,7 @@ def public_state(cfg):
         runtime["work"]["assistant"] = WORK.assess(runtime)
     if runtime["mode"] == "personal":
         result["personal_assistant"] = PERSONAL.snapshot(profile_id, result.get("inbox", {}))
-    result["build"] = "mirror-workflows-v6"
+    result["build"] = "mirror-content-v8"
     result["mirror"] = runtime
     result["message_samples"] = SAMPLES if runtime["mode"] == "personal" else []
     return result

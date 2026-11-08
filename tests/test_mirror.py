@@ -155,7 +155,7 @@ class FeatureTests(unittest.TestCase):
         app.initialize(self.cfg)
 
     def test_profiles_have_separate_widgets_and_private_storage(self):
-        app.STATE["inbox"]["data"]["messages"][0]["subject"] = "OWNER ONLY"
+        app.STATE["inbox"]["data"]["messages"] = [{"id":"mail:test", "subject":"OWNER ONLY", "body":""}]
         app.RUNTIME.select_profile("partner")
         state = app.public_state(self.cfg)
         self.assertEqual(state["settings"]["name"], "Sarah")

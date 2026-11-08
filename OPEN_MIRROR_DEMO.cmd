@@ -35,7 +35,7 @@ if not errorlevel 1 (
 )
 echo Opening the UPDATED mirror demo at http://127.0.0.1:5001
 echo Keep this window open. Press Ctrl+C here to stop the demo.
-start "" /min powershell.exe -NoProfile -Command "$url='http://127.0.0.1:5001'; for($i=0;$i -lt 60;$i++){try{$data=Invoke-RestMethod ($url+'/api/dashboard') -TimeoutSec 1; if($data.build -eq 'mirror-workflows-v6'){Start-Process $url; exit}}catch{}; Start-Sleep -Milliseconds 500}"
+start "" /min powershell.exe -NoProfile -Command "$url='http://127.0.0.1:5001'; for($i=0;$i -lt 60;$i++){try{$data=Invoke-RestMethod ($url+'/api/dashboard') -TimeoutSec 1; if($data.build -eq 'mirror-content-v8'){Start-Process $url; exit}}catch{}; Start-Sleep -Milliseconds 500}"
 py ".\app.py"
 echo.
 echo If the app reported an error, send a screenshot of this window.

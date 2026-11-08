@@ -18,6 +18,16 @@ Every recognized scan returns to Personal. Both Cyril and Sarah have Work mode, 
 
 The display is a 1920×1080 canvas scaled to the actual browser viewport, with safe margins, narrow side columns and a clear central mirror area. Long content advances through pages every 14 seconds, without dropping words. The mouse cursor is hidden. The welcome font is bundled locally, with its license, so it needs no internet. Use browser full screen (F or F11); if the monitor itself crops the image even in full screen, disable its overscan / select “Just Scan” or “Screen Fit”.
 
+## Presentation content
+
+Personal mode keeps the schedule fixed, removes the priorities card, and rotates the supplied briefing and inbox content. Sarah has the ECSW/Calculus briefing, Sunday Calculus study and Monday Physics exam; Cyril has the Zoom project briefing, Monday presentation and Tuesday appointment. These are fixed presentation fixtures used in account-demo mode; live account data is not overwritten. Room temperature/humidity appears only in Work mode. Work rotates today’s assignment and recorded power on the left, retains equipment/work history on the right, and fits the full troubleshooting procedure onto one slide. The Source & coverage card and additional evidence/provenance slides have been removed; historical and training labels remain.
+
+## Room attention warning
+
+In Work mode, an out-of-range room reading displays a gently flashing amber warning in the center and pins the complete troubleshooting checklist on the right. Automatic content rotation pauses. The warning stays bright despite PIR idle dimming; reduced-motion settings disable the pulse. If readings become unavailable during an alert, the checklist remains pinned with sensor-recovery guidance. Normal readings clear the warning and resume rotation. Personal mode and the hello screen retain their usual appearance; pushing the encoder still ends the session.
+
+Laptop test: press 1, Left arrow, then H. The warning and procedure remain displayed. Press O to test lost readings or N to restore normal conditions.
+
 ## Try it on your laptop — no hardware required
 
 1. Extract the ZIP into a **new folder**.
@@ -133,7 +143,7 @@ in:inbox newer_than:30d {free "last chance" "act now" urgent "verification code"
 
 It reviews up to 10 search matches, including read messages. It explains matched phrases, pressure, requests for credentials/codes, money and links, then suggests independent verification through a known official channel. A keyword is a review signal, not proof of phishing. “Free” by itself is common in legitimate promotions. The search is limited, not a full inbox/security audit.
 
-Cyril's training inbox contains a **free-prize claim**; Sarah's contains an **account verification request**. The display shows the actual message excerpt, underlines warning phrases, explains the pressure/payment/code-sharing signals, and gives a specific next action through the official app or known contact. It does not visit links, download attachments, send messages, delete mail or mark messages read. Reviewed excerpts are limited to 650 characters; six-to-eight-digit numbers are redacted. Subjects, senders and excerpts are displayed in Personal mode and may be cached privately. Personal Nemotron review sends these selected fields to NVIDIA only when explicitly enabled below. No match does not mean an email is safe.
+Sarah's training inbox contains the supplied **T-Mobile Identity Management** scenario: a lookalike domain and a **by EOD** deadline, followed by the saved-bookmark/reporting action. The domain is displayed as plain text, never as a clickable link. Cyril's training inbox shows **3 unread** and **No phishing terms detected**; this is scenario text, not a claim that a live inbox was checked. The display shows the actual message excerpt, underlines warning phrases, explains the pressure/payment/code-sharing signals, and gives a specific next action through the official app or known contact. It does not visit links, download attachments, send messages, delete mail or mark messages read. Reviewed excerpts are limited to 650 characters; six-to-eight-digit numbers are redacted. Subjects, senders and excerpts are displayed in Personal mode and may be cached privately. Personal Nemotron review sends these selected fields to NVIDIA only when explicitly enabled below. No match does not mean an email is safe.
 
 Reference guidance: [FTC phishing advice](https://consumer.ftc.gov/articles/how-recognize-avoid-phishing-scams). The UI labels local rules honestly; this is not a trained fraud classifier.
 

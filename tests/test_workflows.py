@@ -75,7 +75,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result['tools'],sorted(PERSONAL_NAMES))
         self.assertEqual([r['tool'] for r in result['trace']],list(PERSONAL_NAMES))
         conversation=json.dumps(transport.call_args.args[1])
-        self.assertIn('Account verification required',conversation)
+        self.assertIn('T-Mobile Identity Management',conversation)
         self.assertNotIn('Last chance: claim your free prize',conversation)
         self.assertEqual(transport.call_count,5)
 

@@ -22,10 +22,10 @@ class Tests(unittest.TestCase):
         from unittest.mock import patch
         with patch.object(app,'weather',side_effect=AssertionError('network used')):
             app.worker(self.cfg,threading.Event())
-        self.assertEqual(app.public_state(self.cfg)['inbox']['data']['unread'],2)
+        self.assertEqual(app.public_state(self.cfg)['inbox']['data']['unread'],3)
 
     def test_bodies_never_leave_backend(self):
-        app.STATE['inbox']['data']['messages'][0]['body']='SECRET BODY'
+        app.STATE['inbox']['data']['messages']=[{'id':'mail:test','subject':'Test','body':'SECRET BODY'}]
         self.assertNotIn('SECRET BODY',json.dumps(app.public_state(self.cfg)))
         self.assertEqual(app.STATE['inbox']['data']['messages'][0]['body'],'SECRET BODY')
 
@@ -62,7 +62,7 @@ class Tests(unittest.TestCase):
     def test_briefing_uses_validated_ollama_result(self):
         from unittest.mock import patch
         self.cfg['ai_enabled']=True
-        with patch.object(app,'read_json',return_value={'response':json.dumps({'summary':'Bring notes.','action_items':[{'text':'Bring notes','source_ids':['mail:demo']}]})}) as call:
+        with patch.object(app,'read_json',return_value={'response':json.dumps({'summary':'Bring notes.','action_items':[{'text':'Bring notes','source_ids':['event:demo-0']}]})}) as call:
             result=app.briefing(self.cfg,app.STATE)
         self.assertEqual(result['summary'],'Bring notes.')
         self.assertFalse(call.call_args.args[1]['stream'])
