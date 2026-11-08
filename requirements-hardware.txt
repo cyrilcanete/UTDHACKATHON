@@ -1,0 +1,2 @@
+# Optional on the device connected to the Arduino. Demo needs no packages.
+pyserial>=3.5,<4

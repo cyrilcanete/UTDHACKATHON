@@ -10,5 +10,31 @@
   "ai_enabled": false,
   "ollama_url": "http://127.0.0.1:11434",
   "ollama_model": "qwen2.5:3b",
-  "briefing_interval_seconds": 1800
+  "briefing_interval_seconds": 1800,
+  "owner_profile_id": "cyril",
+  "profiles": [
+    {
+      "id": "cyril",
+      "name": "Cyril",
+      "rfid_uids": [],
+      "tasks": ["Prepare the software demo", "Review today's schedule"]
+    },
+    {
+      "id": "partner",
+      "name": "Partner",
+      "rfid_uids": [],
+      "tasks": ["Test the RFID reader", "Check the project checklist"]
+    }
+  ],
+  "sensors": {
+    "source": "demo",
+    "port": "",
+    "baudrate": 9600,
+    "stale_after_seconds": 15,
+    "temperature_alert_c": 30,
+    "humidity_min_pct": 30,
+    "humidity_max_pct": 60,
+    "motion_sleep": false,
+    "idle_seconds": 120
+  }
 }

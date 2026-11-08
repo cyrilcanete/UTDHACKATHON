@@ -1,9 +1,41 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Morning Mirror</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
-<body><header><span id="greeting">Morning Mirror</span><span id="mode">Connecting</span><button id="privacy" type="button">Hide personal details</button></header>
-<main><section class="clock"><p id="date"></p><h1 id="time">--:--</h1><p id="next">Your day, at a glance.</p></section>
-<section class="weather"><h2 id="location">Weather</h2><div id="temperature">--°</div><p id="conditions"></p><p id="forecast"></p><small id="weather-status"></small></section>
-<div class="reflection" aria-hidden="true"></div>
-<section class="personal"><h2>Coming up</h2><ul id="events"></ul><small id="calendar-status"></small><h2>Today's focus</h2><ul id="tasks"></ul></section>
-<section class="personal"><h2>Your briefing</h2><p id="summary">Loading your dashboard…</p><ul id="actions"></ul><small id="briefing-status"></small><h2 id="inbox-title">Inbox</h2><ul id="messages"></ul><small id="inbox-status"></small></section>
-</main><footer><span id="connection">Starting…</span><span>Press P for privacy · F for full screen</span></footer></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Morning Mirror</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body data-view="personal">
+  <header><div class="brand"><span class="brand-mark" aria-hidden="true">◈</span><span>MORNING MIRROR</span></div><span id="mode" class="badge">CONNECTING</span><button id="privacy" type="button">Hide personal details</button></header>
+  <nav class="toolbar" aria-label="Mirror controls"><div><p class="eyebrow">YOUR SPACE, YOUR DAY</p><h2 id="greeting">Welcome.</h2></div><div class="segmented" aria-label="Dashboard mode"><button id="personal-mode" class="action-control" type="button" aria-pressed="true">Personal</button><button id="work-mode" class="action-control" type="button" aria-pressed="false">Work</button></div></nav>
+  <div id="notice" class="notice" role="status" aria-live="polite">Connecting to your mirror…</div>
+  <main>
+    <div class="at-a-glance">
+      <section class="clock" aria-label="Time and date"><p id="date"></p><h1 id="time">--:--</h1><p id="next">Your day, at a glance.</p></section>
+      <section id="weather-panel" class="weather"><h2 id="location">Weather</h2><div id="temperature">--°</div><p id="conditions"></p><p id="forecast"></p><small id="weather-status"></small></section>
+      <section id="room-glance" class="weather" hidden><h2>Shared environment</h2><div id="room-temperature">—</div><p id="room-source">Waiting for readings</p><p id="room-status"></p></section>
+    </div>
+    <div class="reflection" aria-hidden="true"></div>
+    <div id="personal-panels" class="panel-grid personal">
+      <section class="panel"><p class="eyebrow">YOUR AGENDA</p><h2>Coming up</h2><ul id="events"></ul><small id="calendar-status"></small><h2>Today's focus</h2><ul id="tasks"></ul></section>
+      <section class="panel"><p class="eyebrow">AT A GLANCE</p><h2>Your briefing</h2><p id="summary">Loading your dashboard…</p><ul id="actions"></ul><small id="briefing-status"></small><h2 id="inbox-title">Inbox</h2><ul id="messages"></ul><small id="inbox-status"></small></section>
+      <section class="panel review-panel"><p class="eyebrow">PAUSE. CHECK. VERIFY.</p><h2>Message check</h2><p class="muted">Look for common warning signs before acting on a message.</p>
+        <div id="message-samples" class="button-row" aria-label="Fictional example messages"></div>
+        <label for="message-text">Message to review</label><textarea id="message-text" maxlength="4000" rows="3" placeholder="Paste a message, or choose a fictional example above."></textarea>
+        <div class="button-row"><button id="review-message" class="primary" type="button">Review message</button><span id="review-progress" class="muted" role="status"></span></div>
+        <div id="review-result" hidden><p id="review-method" class="eyebrow"></p><h3 id="review-verdict"></h3><p id="review-summary"></p><ul id="review-signals"></ul><p id="review-next"></p><p id="review-ai"></p></div>
+      </section>
+    </div>
+    <div id="work-panels" hidden>
+      <section class="metrics" aria-label="Shared room sensor readings">
+        <div class="metric"><p class="eyebrow">TEMPERATURE</p><p id="metric-temperature" class="reading">—</p><small id="temperature-limit"></small></div>
+        <div class="metric"><p class="eyebrow">HUMIDITY</p><p id="metric-humidity" class="reading">—</p><small id="humidity-limit"></small></div>
+        <div class="metric"><p class="eyebrow">MOTION</p><p id="metric-motion" class="reading compact">—</p><small>Shared room · PIR detection</small></div>
+      </section>
+      <div class="panel-grid work-details"><section class="panel"><p class="eyebrow">ATTENTION ITEMS</p><h2 id="work-heading">Room status</h2><ul id="work-alerts"></ul><small id="sensor-updated"></small><p id="sensor-error" class="muted"></p></section><section class="panel"><p class="eyebrow">NEXT OPERATOR</p><h2>Handoff note</h2><p id="handoff"></p><small>Generated from readings and configured thresholds. AI is not used for this note.</small></section></div>
+    </div>
+  </main>
+  <aside id="demo-controls" class="demo-controls" hidden aria-label="Demo controls"><p class="eyebrow">DEVELOP WITHOUT HARDWARE</p><p class="muted">Simulate a card scan. Each card selects a person; each person can use both modes.</p><div id="demo-profiles" class="button-row"></div><div id="demo-scenarios" class="button-row" hidden><span class="muted">Room scenario</span><button type="button" class="action-control" data-scenario="normal">Normal</button><button type="button" class="action-control" data-scenario="hot">Cooling issue</button><button type="button" class="action-control" data-scenario="dry">Low humidity</button><button type="button" class="action-control" data-scenario="offline">Sensor offline</button></div></aside>
+  <footer><span id="connection">Starting…</span><span>P · Privacy &nbsp; M · Mode &nbsp; F · Full screen</span></footer>
+  <div id="sleep-screen" hidden><p>Morning Mirror</p><p class="muted">Motion wakes the display.</p><button id="wake" type="button">Wake display</button></div>
+</body>
+</html>
