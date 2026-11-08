@@ -3,9 +3,11 @@ No equipment actuation, external tickets, or automatic messages. Demo incidents 
 """
 import copy
 import json
+import hashlib
 import threading
 import time
-from nemotron_agent import run
+from nemotron_agent import run, validate_options, describe_error, NemotronError, MODEL
+from nemotron_state import AnalysisState
 from data_center import DataCenter
 from technician import context as technician_context
 from datetime import datetime, timezone
@@ -17,8 +19,7 @@ class WorkAssistant:
         self.lock = threading.RLock()
         self.records = []
         self.data_center = DataCenter()
-        self.ai_result = {}
-        self.ai_key = None
+        self.analysis = AnalysisState()
         self.storage_error = False
         if not cfg['demo'] and path.exists():
             try:
@@ -66,45 +67,89 @@ class WorkAssistant:
                     self.storage_error = True
             if self.storage_error:
                 storage = 'Journal save failed; incident is in memory only'
-            return {'technician': technician_context(self.cfg, snapshot), 'data_center': self.data_center.snapshot(), 'ai_status': self.ai_status(snapshot['active_profile']), 'ai': copy.deepcopy(self.ai_result.get(snapshot['active_profile'])), 'method': 'Local rules · not an AI diagnosis', 'asset': asset, 'context': context,
+            assessment = {'technician': technician_context(self.cfg, snapshot), 'data_center': self.data_center.snapshot(), 'method': 'Local rules · not an AI diagnosis', 'asset': asset, 'context': context,
                     'related_work_orders': [o for o in orders if o.get('asset_id') == asset['id']],
                     'possible_impact': ('Check dependency: ' + ', '.join(affected)) if affected else 'No downstream dependencies configured; impact is unconfirmed.',
                     'procedure': procedures if work['status'] != 'normal' else ['Readings are within configured limits. Continue monitoring.'],
                     'incident': copy.deepcopy(incident), 'storage': storage,
                     'trace': ['Read fresh sensor data', 'Look up asset and related work orders', 'Select verification procedure', 'Record local incident if attention is needed']}
 
-    @staticmethod
-    def evidence_key(snapshot):
-        s = snapshot['sensors']
-        return json.dumps({k: s[k] for k in ('temperature_c', 'humidity_pct', 'source', 'status')}, sort_keys=True)
+            state = self.analysis.view(snapshot['active_profile'], self.evidence_key(snapshot, assessment),
+                                       self.cfg.get('nemotron', {}).get('model', MODEL),
+                                       disabled=self.disabled_reason(), problem=self.problem(assessment))
+            assessment.update(state)
+            assessment['ai_status'] = state['ai_state']['message']
+            return assessment
+
+    def disabled_reason(self):
+        options = self.cfg.get('nemotron', {})
+        if not options.get('enabled'):
+            return 'Nemotron is off. Enable it in the local configuration.'
+        if self.cfg['demo'] and not options.get('allow_demo', False):
+            return 'Nemotron calls for training data are off. Enable allow_demo to use them.'
+        return None
+
+    def problem(self, assessment):
+        if self.disabled_reason():
+            return None
+        try:
+            validate_options(self.cfg.get('nemotron', {}))
+        except Exception as error:
+            return describe_error(error)
+        if not assessment['data_center'].get('available'):
+            return {'code': 'evidence_unavailable', 'message': 'The historical data-center evidence is unavailable. Check the local dataset.'}
+        return None
+
+    def evidence_key(self, snapshot, assessment=None):
+        assessment = assessment or {'technician': technician_context(self.cfg, snapshot), 'data_center': self.data_center.snapshot()}
+        sensors = snapshot['sensors']
+        tc = assessment['technician']
+        evidence = {
+            'sensors': {k: sensors.get(k) for k in ('temperature_c', 'humidity_pct', 'source', 'status', 'simulated')},
+            'limits': snapshot['work']['limits'],
+            'technician': {k: tc.get(k) for k in ('technician', 'asset', 'training', 'label', 'assigned_orders', 'related_orders', 'procedure', 'procedure_status', 'next_step', 'assessment')},
+            'data_center': assessment['data_center'],
+            'model': self.cfg.get('nemotron', {}).get('model', MODEL),
+        }
+        return hashlib.sha256(json.dumps(evidence, sort_keys=True).encode()).hexdigest()
+
+    def request_run(self, snapshot):
+        if self.disabled_reason():
+            raise NemotronError('disabled', self.disabled_reason())
+        assessment = self.assess(snapshot)
+        problem = self.problem(assessment)
+        if problem:
+            raise NemotronError(problem['code'], problem['message'])
+        return self.analysis.queue(snapshot['active_profile'], self.evidence_key(snapshot, assessment),
+                                   self.cfg.get('nemotron', {}).get('model', MODEL))
+
+    def step(self, runtime):
+        if self.disabled_reason():
+            return
+        snapshot = runtime.snapshot()
+        if snapshot['mode'] != 'work' or not snapshot['active_profile']:
+            return
+        pid = snapshot['active_profile']
+        assessment = self.assess(snapshot)
+        if self.problem(assessment):
+            return
+        key = self.evidence_key(snapshot, assessment)
+        token = self.analysis.begin(pid, key, self.cfg.get('nemotron', {}).get('model', MODEL), time.monotonic())
+        if token is None:
+            return
+        try:
+            result = run(self.cfg.get('nemotron', {}), snapshot, assessment,
+                         on_progress=lambda event: self.analysis.progress(pid, token, event))
+            # Recompute the original technician's evidence even if another profile is now active.
+            current = dict(runtime.snapshot(), active_profile=pid)
+            self.analysis.finish(pid, token, key, result, self.evidence_key(current))
+        except Exception as error:
+            current = dict(runtime.snapshot(), active_profile=pid)
+            self.analysis.fail(pid, token, key, describe_error(error), self.evidence_key(current))
 
     def worker(self, runtime, stop):
-        options = self.cfg.get('nemotron', {})
-        if (self.cfg['demo'] and not options.get('allow_demo', False)) or not options.get('enabled'):
+        if self.disabled_reason():
             return
-        last_key, due = {}, {}
         while not stop.is_set():
-            snapshot = runtime.snapshot()
-            pid=snapshot['active_profile']
-            key = self.evidence_key(snapshot)
-            if snapshot['mode'] == 'work' and key != last_key.get(pid) and time.monotonic() >= due.get(pid,0):
-                due[pid] = time.monotonic() + 300  # Bound optional remote usage.
-                assessment = self.assess(snapshot)
-                try:
-                    result = run(options, snapshot, assessment)
-                except Exception:
-                    result = {'method': 'Nemotron unavailable', 'note': 'Showing local rules. Check the configured endpoint, model and API key.'}
-                with self.lock:
-                    result['generated_at'] = datetime.now(timezone.utc).isoformat()
-                    self.ai_key = key
-                    self.ai_result[pid] = result
-                last_key[pid] = key if 'tools' in result else None
+            self.step(runtime)
             stop.wait(2)
-
-    def ai_status(self, pid=None):
-        options=self.cfg.get('nemotron', {})
-        if not options.get('enabled') or (self.cfg['demo'] and not options.get('allow_demo',False)):
-            return 'Nemotron setup required'
-        if pid not in self.ai_result:
-            return 'Nemotron ready / analyzing in background'
-        return self.ai_result[pid].get('method','Nemotron status unavailable')
