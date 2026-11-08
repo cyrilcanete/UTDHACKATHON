@@ -4,6 +4,7 @@
 #include "mirror_inputs.h"
 
 void emitEncoder(int delta) { Bridge.notify("on_mirror_encoder", delta); }
+void emitAnalyze() { Bridge.notify("on_mirror_analyze"); }
 void emitPress() { Bridge.notify("on_mirror_press"); }
 void emitSensors(float temperature, float humidity, bool motion) {
   Bridge.notify("on_mirror_sensors", isnan(temperature) ? -999.0f : temperature, isnan(humidity) ? -999.0f : humidity, motion);
