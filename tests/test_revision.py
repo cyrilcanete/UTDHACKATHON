@@ -102,12 +102,13 @@ class RevisionTests(unittest.TestCase):
         replies=[{'tool_calls':[{'id':n,'type':'function','function':{'name':n,'arguments':'{}'}} for n in NAMES]},
                  {'content':'Verify the sensor reading before taking action.'}]
         transport=Mock(side_effect=replies)
-        result=run({'enabled':True},snap,assessment,transport)
+        provenance=Mock(return_value={'available':False,'status':'unavailable','checked_at':None,'reason':'offline_test'})
+        result=run({'enabled':True},snap,assessment,transport,provenance_fetcher=provenance)
         self.assertEqual(result['tools'],sorted(NAMES))
         self.assertEqual(sum(m['role']=='tool' for m in transport.call_args.args[1]),len(NAMES))
         for reply in ({'content':'Unverified answer'}, {'tool_calls':[{'id':'bad','function':{'name':'send_email','arguments':'{}'}}]}):
             with self.assertRaises(ValueError):
-                run({'enabled':True},snap,assessment,Mock(return_value=reply))
+                run({'enabled':True},snap,assessment,Mock(return_value=reply),provenance_fetcher=provenance)
 
     def test_update_copy_preserves_private_files_and_backs_up_sources(self):
         from copy_update_to_repo import apply_update
