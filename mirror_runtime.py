@@ -71,9 +71,12 @@ class MirrorRuntime:
         "dry": {"temperature_c": 24.0, "humidity_pct": 18.0, "motion": True},
     }
 
-    def __init__(self, cfg, clock=time.monotonic):
+    def __init__(self, cfg, clock=time.monotonic, on_analyze=None):
         self.cfg, self.clock = cfg, clock
         self.lock = threading.RLock()
+        self.on_analyze = on_analyze
+        self.analysis_feedback = None
+        self.analysis_feedback_until = 0
         self.profiles = profiles_for(cfg)
         self.active = None
         self.modes = {p["id"]: "personal" for p in self.profiles}
@@ -125,6 +128,7 @@ class MirrorRuntime:
             if profile_id not in self.modes:
                 raise ValueError("Unknown profile")
             self.active = profile_id
+            self.analysis_feedback = None
             self.encoder_progress = 0
             self.modes[profile_id] = "personal"
             self.last_motion = self.clock()
@@ -135,6 +139,7 @@ class MirrorRuntime:
         if mode == "welcome":
             with self.lock:
                 self.active = None
+                self.analysis_feedback = None
                 self.encoder_progress = 0
                 self.event = "Scan your card to begin."
                 self.last_motion = self.clock()
@@ -145,6 +150,7 @@ class MirrorRuntime:
             if self.active is None:
                 return  # A knob turn cannot start a private session.
             self.modes[self.active] = mode
+            self.analysis_feedback = None
             self.encoder_progress = 0
             self.last_motion = self.clock()
             name = next(p["name"] for p in self.profiles if p["id"] == self.active)
@@ -159,6 +165,12 @@ class MirrorRuntime:
             self.select_profile(self.uid_map[uid])
             return True
 
+    def report_analysis(self, message, code):
+        with self.lock:
+            self.event = message
+            self.analysis_feedback = {'message': message, 'code': code}
+            self.analysis_feedback_until = self.clock() + 6
+
     def ingest(self, payload):
         """Validate the whole event before changing state; missing/null readings stay unavailable."""
         if not isinstance(payload, dict):
@@ -167,17 +179,24 @@ class MirrorRuntime:
             raise ValueError("Unknown hardware event type")
         mode = payload.get("mode")
         encoder_delta = None
+        analyze = False
         if payload.get("type") == "encoder":
             # Each delta is a physical detent, not a quadrature electrical edge.
             if "uid" in payload or "mode" in payload:
                 raise ValueError("Send card and encoder events separately")
+            if any(key in payload for key in ("temperature_c", "humidity_pct", "motion")):
+                raise ValueError("Send sensor and encoder events separately")
             supplied = [key for key in ("action", "direction", "delta") if key in payload]
             if len(supplied) != 1:
                 raise ValueError("Send exactly one encoder action, direction or delta")
             if "action" in payload:
-                if payload["action"] not in ("press", "push"):
+                if payload["action"] not in ("press", "push", "analyze"):
                     raise ValueError("Unknown encoder action")
-                mode = "welcome"
+                # Updated firmware sends analyze on short release and press on a
+                # one-second hold. Legacy press events retain their old behavior.
+                analyze = payload["action"] == "analyze"
+                if not analyze:
+                    mode = "welcome"
             elif "direction" in payload:
                 directions = {"right": self.right_delta, "left": -self.right_delta, "decrement": -1, "increment": 1}
                 value = payload["direction"]
@@ -202,7 +221,7 @@ class MirrorRuntime:
                 raise ValueError("motion must be true or false")
             fields["motion"] = payload["motion"]
         uid = normalize_uid(payload["uid"]) if "uid" in payload else None
-        if not fields and uid is None and mode is None and encoder_delta is None:
+        if not fields and uid is None and mode is None and encoder_delta is None and not analyze:
             raise ValueError("Event needs uid, mode or sensor readings")
         with self.lock:
             now = self.clock()
@@ -218,6 +237,15 @@ class MirrorRuntime:
                     return False
             if mode is not None:
                 self.set_mode(mode)
+            if analyze:
+                self.last_motion = now
+                self.encoder_progress = 0
+                if self.active is None:
+                    self.report_analysis('Scan a card before requesting analysis.', 'no_profile')
+                elif self.on_analyze is not None:
+                    self.on_analyze()
+                else:
+                    self.report_analysis('Nemotron control is not connected.', 'unavailable')
             if encoder_delta is not None:
                 self.last_motion = now
                 if self.active is not None:
@@ -274,6 +302,7 @@ class MirrorRuntime:
                 "active_profile": self.active,
                 "profiles": [{"id": p["id"], "name": p["name"]} for p in self.profiles],
                 "mode": self.modes[self.active] if self.active else "welcome", "event": self.event, "screen_awake": awake,
+                "analysis_feedback": copy.deepcopy(self.analysis_feedback) if self.active and now < self.analysis_feedback_until else None,
                 "encoder": {"detents_per_revolution": self.detents_per_revolution, "half_turn_detents": self.half_turn,
                             "progress_detents": abs(self.encoder_progress), "right_mode": "personal", "left_mode": "work"},
                 "brightness": brightness,
